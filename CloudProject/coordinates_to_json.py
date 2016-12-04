@@ -6,7 +6,6 @@ if sys.version_info[0]==3:
     raw_input = input
 while True:
     try:
-        f = open(filename,'a')
         street_ave_name = raw_input("Enter Street Ave Name: ")
         between1 = raw_input("Between 1st name: ")
         between2 = raw_input("Between 2nd name: ")
@@ -16,6 +15,7 @@ while True:
         lon = lat_long.split(",")[1].strip()
         json_entry = '{"street_ave_name": "'+street_ave_name+'", "between": "'+between1+','+between2+'", parking_allowed: "'+parking_allowed+'", "location":{"lat":'+lat+', "lon":'+lon+'}}'
         print("Added: "+json_entry)
+        f = open(filename,'a')
         f.write(json_entry+"\n")
         f.close()
     except:
