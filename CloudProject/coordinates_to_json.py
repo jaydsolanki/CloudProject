@@ -13,7 +13,7 @@ while True:
         lat_long = raw_input("Latitude, Longitude: ")
         lat = lat_long.split(",")[0].strip()
         lon = lat_long.split(",")[1].strip()
-        json_entry = '{"street_ave_name": "'+street_ave_name+'", "between": "'+between1+','+between2+'", parking_allowed: "'+parking_allowed+'", "location":{"lat":'+lat+', "lon":'+lon+'}}'
+        json_entry = '{"street_ave_name": "'+street_ave_name+'", "between": "'+between1+','+between2+'", "parking_allowed": "'+parking_allowed+'", "location":{"lat":'+lat+', "lon":'+lon+'}}'
         print("Added: "+json_entry)
         f = open(filename,'a')
         f.write(json_entry+"\n")
