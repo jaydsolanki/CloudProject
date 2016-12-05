@@ -4,5 +4,10 @@ from django.http import HttpResponse
 
 
 def index(request):
-    return HttpResponse()
+    context = {"title": "Home"}
+    return render(request, 'index.html', context)
 
+
+def collect_data(request):
+    context = {"title": "Collect Data"}
+    return render(request, 'collect_data.html', context)
