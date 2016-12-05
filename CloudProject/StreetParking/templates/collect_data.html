@@ -1,9 +1,88 @@
 {% extends 'base.html' %}
 
 {% block head %}
+    <script src="http://maps.google.com/maps/api/js?key=AIzaSyDQQ8a2--acM4YfkScjmgBV8M9ObR2_P9M&" type="text/javascript"></script>
+    <script>
+        window.user_markers = [];
+        window.current_latlng = null;
+        $(document).ready(function () {
+            var user_pinColor = "6600cc";
+            var user_pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + user_pinColor,
+                    new google.maps.Size(21, 34),
+                    new google.maps.Point(0, 0),
+                    new google.maps.Point(10, 34));
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 12,
+                center: new google.maps.LatLng(40.758896, -73.985130),
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            });
+            google.maps.event.addListener(map, 'click', function (e) {
+                window.current_latlng = e;
+                for (var j = 0; j < window.user_markers.length; j++) {
+                    window.user_markers[j].setMap(null);
+                }
+                $("#selected_lat").text(e.latLng.lat());
+                $("#selected_lon").text(e.latLng.lng());
+                $("#lat").val(e.latLng.lat());
+                $("#lon").val(e.latLng.lng());
+                marker = new google.maps.Marker({
+                    position: e.latLng,
+                    title: "U",
+                    icon: user_pinImage,
+                    map: map
+                });
+                window.user_markers.push(marker);
+            });
 
+            $("#add_entry").click(function () {
+                if ($("#lat").val() == '' || $("#lon").val() == '' || $("#street_ave_name").val() == '' || $("#between1").val() == '' || $("#between2").val() == '') {
+                    alert("Please enter all details");
+                } else {
+                    $("#lat").val('');
+                    $("#lon").val('');
+                    $("#between1").val($("#between2").val());
+                    $("#between2").val("");
+                    //Ajax Call
+                }
+
+            });
+        });
+    </script>
 {% endblock %}
 
 {% block content %}
+    <div align="center">
+        <h1> Collect Data</h1>
+        <p> This page helps to collect coordinates of street/avenue.</p>
+    </div>
+    <div class="row">
+        <div class="col col-md-6">
+            <label>Latitude: <span id="selected_lat"></span></label>
+            <label>Longitude: <span id="selected_lon"></span></label>
+        </div>
+    </div>
+    <div id="map" style="width: 1200px; height: 600px;">
 
+    </div>
+    <hr/>
+    <div class="row">
+        <div class="col col-md-2">
+            <input id="lat" class="form-control" placeholder="latitude"/>
+        </div>
+        <div class="col col-md-2">
+            <input id="lon" class="form-control" placeholder="longitude"/>
+        </div>
+        <div class="col col-md-2">
+            <input id="street_ave_name" class="form-control" placeholder="Street/Ave Name"/>
+        </div>
+        <div class="col col-md-2">
+            <input id="between1" class="form-control" placeholder="Between 1"/>
+        </div>
+        <div class="col col-md-2">
+            <input id="between2" class="form-control" placeholder="Between 2"/>
+        </div>
+        <div class="col col-md-2">
+            <button class="btn btn-success" id="add_entry">Add Entry</button>
+        </div>
+    </div>
 {% endblock %}
