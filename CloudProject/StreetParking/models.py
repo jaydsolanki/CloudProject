@@ -136,6 +136,7 @@ class ParkingData(models.Model):
     parking_spots = models.IntegerField(blank=True, null=True)
     street_ave_name = models.CharField(max_length=100, blank=True, null=True)
     between_street_ave = models.CharField(max_length=100, blank=True, null=True)
+    parking_allowed = models.NullBooleanField()
 
     class Meta:
         managed = False

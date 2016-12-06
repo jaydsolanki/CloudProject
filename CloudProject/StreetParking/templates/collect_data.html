@@ -107,6 +107,7 @@
                         lng: lng,
                         street_ave_name: $("#street_ave_name").val(),
                         between: $("#between1").val() + "," + $("#between2").val(),
+                        num_parking: $("#num_parking").val(),
                         parking_allowed: true
                     },
                     success: function (response) {
@@ -154,9 +155,6 @@
         </div>
         <div class="col col-md-2">
             <input id="num_parking" class="form-control" placeholder="num parking" value="20"/>
-        </div>
-        <div class="col col-md-2">
-            <button class="btn btn-success" id="add_entry">Add Entry</button>
         </div>
     </div>
 

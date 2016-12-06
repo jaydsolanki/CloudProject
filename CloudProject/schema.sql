@@ -5,5 +5,6 @@ CREATE TABLE parking_data(
     longitude DOUBLE,
     parking_spots INTEGER,
     street_ave_name VARCHAR(100),
-    between_street_ave VARCHAR(100)
+    between_street_ave VARCHAR(100),
+    parking_allowed BOOL
 )
