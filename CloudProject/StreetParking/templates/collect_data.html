@@ -20,8 +20,8 @@
                     new google.maps.Point(0, 0),
                     new google.maps.Point(10, 34));
             var map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 12,
-                center: new google.maps.LatLng(40.758896, -73.985130),
+                zoom: 13,
+                center: new google.maps.LatLng(40.748896, -73.985130),
             });
             var noPoi = [
                 {
@@ -110,6 +110,11 @@
                     },
                     error: function (response) {
                         alert(JSON.stringify(response));
+                    },
+                    complete: function () {
+                        $("#between1").val($("#between2").val());
+                        $("#between2").val("");
+
                     }
                 })
             };
