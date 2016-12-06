@@ -14,10 +14,10 @@ def index(request):
 
 @csrf_exempt
 def collect_data(request):
-    lat_long_list = list(ParkingData.objects.all().values_list('latitude', 'longitude'))
-    for i in range(len(lat_long_list)):
-        lat_long_list[i] = list(lat_long_list[i])
-    context = {"title": "Collect Data", 'lat_long_list': lat_long_list}
+    parking_data = list(ParkingData.objects.all().values_list('latitude', 'longitude','street_ave_name','parking_spots','between_street_ave'))
+    # for i in range(len(lat_long_list)):
+    #     lat_long_list[i] = list(lat_long_list[i])
+    context = {"title": "Collect Data", 'parking_data': parking_data}
     return render(request, 'collect_data.html', context)
 
 

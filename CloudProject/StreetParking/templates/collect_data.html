@@ -31,10 +31,10 @@
                     ]
                 }
             ];
-            {% for lat_long in lat_long_list %}
+            {% for lat_long in parking_data %}
                 var marker{{ forloop.counter }} = new google.maps.Marker({
                     position: {"lat": parseFloat({{ lat_long.0 }}), "lng": parseFloat({{ lat_long.1 }})},
-                    title: 'Pile Data',
+                    title: "{{ lat_long.2 }}; {{ lat_long.3 }}; {{ lat_long.4 }}",
                     icon: stored_pinImage,
                     map: map
                 });
@@ -63,11 +63,6 @@
             map.setOptions({styles: noPoi});
             google.maps.event.addListener(map, 'click', function (e) {
                 window.current_latlng = e;
-                {#                for (var j = 0; j < window.user_markers.length; j++) {#}
-                {#                    window.user_markers[j].setMap(null);#}
-                {#                }#}
-                $("#selected_lat").text(e.latLng.lat());
-                $("#selected_lon").text(e.latLng.lng());
                 $("#lat").val(e.latLng.lat());
                 $("#lon").val(e.latLng.lng());
                 var marker = new google.maps.Marker({
@@ -122,19 +117,16 @@
     </script>
 {% endblock %}
 
-{% block content %}
+{% block outcontent %}
     <div align="center">
-        <h1> Collect Data</h1>
-        <p> This page helps to collect coordinates of street/avenue.</p>
+        <h5> Collect Data: Enter information and click on map to dump that point to db. To delete click that point again.</h5>
     </div>
     <div class="row">
-        <div class="col col-md-6">
-            <label>Latitude: <span id="selected_lat"></span></label>
-            <label>Longitude: <span id="selected_lon"></span></label>
-        </div>
-    </div>
-    <div id="map" style="width: 1200px; height: 600px;">
+        <div class="col col-md-12">
+            <div id="map" style="width: 1650px; height: 750px;">
 
+            </div>
+        </div>
     </div>
     <hr/>
     <div class="row">
