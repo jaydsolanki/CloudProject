@@ -8,7 +8,7 @@ def db_to_json(file_name, output_file_name):
     f = open(output_file_name,'w')
     for record in records:
         parking_allowed = 'true' if record[6]==1 else 'false'
-        json_record = '{"latitude":'+str(record[1])+', "longitude":'+str(record[2])+', "parking_spots":'+str(record[3])+', "street_ave_name":"'+str(record[4])+'", "between_street_ave":"'+str(record[5])+'", "parking_allowed":'+parking_allowed+', "parking_on":"'+record[7]+'"}'
+        json_record = '{location:{"latitude":'+str(record[1])+', "longitude":'+str(record[2])+'}, "parking_spots":'+str(record[3])+', "street_ave_name":"'+str(record[4])+'", "between_street_ave":"'+str(record[5])+'", "parking_allowed":'+parking_allowed+', "parking_on":"'+record[7]+'"}'
         f.write(json_record+"\n")
     f.close()
     cursor.close()
