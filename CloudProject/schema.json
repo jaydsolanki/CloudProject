@@ -1,0 +1,70 @@
+{
+    "collection": "user",
+    "schema": {
+        "user_id": "integer",
+        "first_name": "string",
+        "last_name": "string",
+        "home_coordinates":{
+            "lng": "float",
+            "lat": "float"
+        },
+        "office_coordinates":{
+            "lng": "float",
+            "lat": "float"
+        },
+        "office_time": "time",
+        "member_since": "datetime",
+        "profile_pic": "string"
+    },
+}
+
+
+{
+    "collection": "parking_queries",
+    "schema": {
+        "date_time_of_query": "datetime",
+        "coordinates":{
+            "lng": "float",
+            "lat": "float"
+        },
+        "user_id": "integer"
+    }
+}
+
+
+{
+    "collection": "user_points",
+    "schema":{
+            "user_id": "integer",
+            "points": "float"
+    }
+}
+
+{
+    "collection": "parking_data",
+    "schema":{
+        "parking_spot_id": "integer",
+        "street_ave_name":"string",
+        "between_street_ave": "string",
+        "parking_allowed": "boolean",
+        "parking_spots": "integer",
+        "coordinates":{
+            "lng": "float",
+            "lat": "float"
+        }
+    }
+
+}
+
+
+{
+    "collection": "parking",
+    "schema":{
+        "user_id": "integer",
+        "parking_spot_id": "integer",
+        "parking_date_time": "datetime",
+        "parked": "boolean",
+        "parking_leave_time": "datetime"
+    }
+
+}
