@@ -14,7 +14,7 @@ def index(request):
 
 @csrf_exempt
 def collect_data(request):
-    parking_data = list(ParkingData.objects.all().values_list('latitude', 'longitude','street_ave_name','parking_spots','between_street_ave'))
+    parking_data = list(ParkingData.objects.all().values_list('latitude', 'longitude','street_ave_name','parking_spots','between_street_ave','parking_on'))
     # for i in range(len(lat_long_list)):
     #     lat_long_list[i] = list(lat_long_list[i])
     context = {"title": "Collect Data", 'parking_data': parking_data}
@@ -30,8 +30,9 @@ def add_parking_data(request):
     street_ave_name = request.POST['street_ave_name']
     parking_allowed = request.POST['parking_allowed']
     parking_allowed = True if parking_allowed == "true" else False
+    parking_on = request.POST['parking_on']
     print("PARKING ALLOWED: "+str(parking_allowed)+"; TYPE: "+str(type(parking_allowed)))
-    pd = ParkingData(latitude=lat, longitude=lng, parking_allowed=parking_allowed, parking_spots=num_parking, between_street_ave= between, street_ave_name=street_ave_name)
+    pd = ParkingData(latitude=lat, longitude=lng, parking_allowed=parking_allowed, parking_spots=num_parking, between_street_ave= between, street_ave_name=street_ave_name, parking_on=parking_on)
     pd.save()
     return HttpResponse()
 

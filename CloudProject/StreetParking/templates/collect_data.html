@@ -19,6 +19,11 @@
                     new google.maps.Size(21, 34),
                     new google.maps.Point(0, 0),
                     new google.maps.Point(10, 34));
+            var stored_pinColor2 = "D9534F";
+            var stored_pinImage2 = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + stored_pinColor2,
+                    new google.maps.Size(21, 34),
+                    new google.maps.Point(0, 0),
+                    new google.maps.Point(10, 34));
             var map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 13,
                 center: new google.maps.LatLng(40.748896, -73.985130),
@@ -35,7 +40,11 @@
                 var marker{{ forloop.counter }} = new google.maps.Marker({
                     position: {"lat": parseFloat({{ lat_long.0 }}), "lng": parseFloat({{ lat_long.1 }})},
                     title: "{{ lat_long.2 }}; {{ lat_long.3 }}; {{ lat_long.4 }}",
-                    icon: stored_pinImage,
+                    {% if lat_long.5 == "street" %}
+                        icon: stored_pinImage,
+                    {% else %}
+                        icon: stored_pinImage2,
+                    {% endif %}
                     map: map
                 });
                 marker{{ forloop.counter }}.addListener('click', function () {
@@ -103,7 +112,8 @@
                         street_ave_name: $("#street_ave_name").val(),
                         between: $("#between1").val() + "," + $("#between2").val(),
                         num_parking: $("#num_parking").val(),
-                        parking_allowed: true
+                        parking_allowed: true,
+                        parking_on: $("#parking_on:checked").val()
                     },
                     success: function (response) {
 
@@ -112,11 +122,120 @@
                         alert(JSON.stringify(response));
                     },
                     complete: function () {
-                        $("#between1").val($("#between2").val());
-                        $("#between2").val("");
+                        var bet1 = $("#between1").val();
+                        var bet2 = $("#between2").val();
+                        var street_ave_name = $("#street_ave_name").val();
+
+
+                        $("#between1").val(bet2);
+
+                        if (bet1.toLowerCase() == "1st ave") {
+                            $("#between2").val("2nd Ave");
+                        } else if (bet1.toLowerCase() == "2nd ave") {
+                            $("#between2").val("3rd Ave");
+                        } else if (bet1.toLowerCase() == "3rd ave") {
+                            $("#between2").val("Lexington Ave");
+                        } else if (bet1.toLowerCase() == "lexington ave") {
+                            $("#between2").val("Park Ave");
+                        } else if (bet1.toLowerCase() == "park ave") {
+                            $("#between2").val("madison ave");
+                        } else if (bet1.toLowerCase() == "madison ave") {
+                            $("#between2").val("5th Ave");
+                        } else if (bet1.toLowerCase() == "4th ave") {
+                            $("#between2").val("5th Ave");
+                        } else if (bet1.toLowerCase() == "5th ave") {
+                            $("#between2").val("6th Ave");
+                        } else if (bet1.toLowerCase() == "6th ave") {
+                            $("#between2").val("7th Ave");
+                        } else if (bet1.toLowerCase() == "7th ave") {
+                            $("#between2").val("8th Ave");
+                        } else if (bet1.toLowerCase() == "8th ave") {
+                            $("#between2").val("9th Ave");
+                        } else if (bet1.toLowerCase() == "9th ave") {
+                            $("#between2").val("10th Ave");
+                        } else if (bet1.toLowerCase() == "10th ave") {
+                            $("#between2").val("11th Ave");
+                        } else if (bet1.toLowerCase() == "11th ave") {
+                            $("#between2").val("12th Ave");
+                        } else {
+                            $("#between2").val("");
+                        }
+                        if (bet2.toLowerCase() == "lexington ave") {
+                            $("#num_parking").val("30");
+                        } else if (bet2.toLowerCase() == "park ave") {
+                            $("#num_parking").val("30");
+                        } else if (bet2.toLowerCase() == "madison ave") {
+                            $("#num_parking").val("30");
+                        }
+                        else if (bet2.toLowerCase() == "6th ave") {
+                            $("#num_parking").val("60");
+                        } else if (bet2.toLowerCase() == "7th ave") {
+                            $("#num_parking").val("44");
+                        } else if (bet2.toLowerCase() == "8th ave") {
+                            $("#num_parking").val("44");
+                        } else if (bet2.toLowerCase() == "9th ave") {
+                            $("#num_parking").val("44");
+                        } else if (bet2.toLowerCase() == "10th ave") {
+                            $("#num_parking").val("44");
+                        } else if (bet2.toLowerCase() == "11th ave") {
+                            $("#num_parking").val("44");
+                        } else if (bet2.toLowerCase() == "12th ave") {
+                            $("#num_parking").val("40");
+                        }
+
+                        //Logic for avenues
+                        if($("#parking_on:checked").val()=="avenue"){
+                        //if (street_ave_name.toLowerCase().endsWith('ave') || street_ave_name.toLowerCase().startsWith('avenue')) {
+                            var streetNum = $.fn.extractStartNumbers(bet2)+1;
+                            if(streetNum!=1){
+                                $("#between2").val(streetNum+ $.fn.getNumberAdjective(streetNum)+" st");
+                            }
+                        }
 
                     }
-                })
+
+                });
+            };
+            $.fn.getNumberAdjective = function (num_val) {
+                if (num_val <= 10) {
+                    if (num_val == 1) {
+                        return "st";
+                    } else if (num_val == 2) {
+                        return "nd";
+                    } else if (num_val == 3) {
+                        return "rd";
+                    } else {
+                        return "th";
+                    }
+                }
+                else {
+                    var str_val = num_val + "";
+                    if (str_val[str_val.length - 2] == '1') {
+                        return 'th';
+                    } else {
+                        if (str_val[str_val.length - 1] == '1') {
+                            return "st";
+                        } else if (str_val[str_val.length - 1] == '2') {
+                            return "nd";
+                        } else if (str_val[str_val.length - 1] == '3') {
+                            return "rd";
+                        } else {
+                            return "th";
+                        }
+                    }
+                }
+            };
+
+            $.fn.extractStartNumbers = function (str_val) {
+                var number = 0;
+                for (var i = 0; i < str_val.length; i++) {
+                    var int_val = parseInt(str_val[i]);
+                    if (isNaN(int_val)) {
+                        break;
+                    }
+                    number = number * 10 + int_val;
+                }
+                return number;
             };
         });
     </script>
@@ -144,14 +263,18 @@
         <div class="col col-md-2">
             <input id="street_ave_name" class="form-control" placeholder="Street/Ave Name"/>
         </div>
-        <div class="col col-md-2">
+        <div class="col col-md-1">
             <input id="between1" class="form-control" placeholder="Between 1"/>
         </div>
-        <div class="col col-md-2">
+        <div class="col col-md-1">
             <input id="between2" class="form-control" placeholder="Between 2"/>
         </div>
-        <div class="col col-md-2">
+        <div class="col col-md-1">
             <input id="num_parking" class="form-control" placeholder="num parking" value="20"/>
+        </div>
+        <div class="col col-md-3">
+            <input id="parking_on" name="parking_on" type="radio" value="street" checked="checked"/> <label> Street</label>
+            <input id="parking_on" name="parking_on" type="radio" value="avenue"/> <label> Avenue</label>
         </div>
     </div>
 
