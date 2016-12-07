@@ -122,12 +122,12 @@
                         alert(JSON.stringify(response));
                     },
                     complete: function () {
-                        var bet1 = $("#between1").val();
                         var bet2 = $("#between2").val();
                         var street_ave_name = $("#street_ave_name").val();
 
 
                         $("#between1").val(bet2);
+                        var bet1 = $("#between1").val();
 
                         if (bet1.toLowerCase() == "1st ave") {
                             $("#between2").val("2nd Ave");
@@ -160,26 +160,26 @@
                         } else {
                             $("#between2").val("");
                         }
-                        if (bet2.toLowerCase() == "lexington ave") {
+                        if ($("#between2").val().toLowerCase() == "lexington ave") {
                             $("#num_parking").val("30");
-                        } else if (bet2.toLowerCase() == "park ave") {
+                        } else if ($("#between2").val().toLowerCase() == "park ave") {
                             $("#num_parking").val("30");
-                        } else if (bet2.toLowerCase() == "madison ave") {
+                        } else if ($("#between2").val().toLowerCase() == "madison ave") {
                             $("#num_parking").val("30");
                         }
-                        else if (bet2.toLowerCase() == "6th ave") {
+                        else if ($("#between2").val().toLowerCase() == "6th ave") {
                             $("#num_parking").val("60");
-                        } else if (bet2.toLowerCase() == "7th ave") {
+                        } else if ($("#between2").val().toLowerCase() == "7th ave") {
                             $("#num_parking").val("44");
-                        } else if (bet2.toLowerCase() == "8th ave") {
+                        } else if ($("#between2").val().toLowerCase() == "8th ave") {
                             $("#num_parking").val("44");
-                        } else if (bet2.toLowerCase() == "9th ave") {
+                        } else if ($("#between2").val().toLowerCase() == "9th ave") {
                             $("#num_parking").val("44");
-                        } else if (bet2.toLowerCase() == "10th ave") {
+                        } else if ($("#between2").val().toLowerCase() == "10th ave") {
                             $("#num_parking").val("44");
-                        } else if (bet2.toLowerCase() == "11th ave") {
+                        } else if ($("#between2").val().toLowerCase() == "11th ave") {
                             $("#num_parking").val("44");
-                        } else if (bet2.toLowerCase() == "12th ave") {
+                        } else if ($("#between2").val().toLowerCase() == "12th ave") {
                             $("#num_parking").val("40");
                         }
 
