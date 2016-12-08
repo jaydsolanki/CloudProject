@@ -1,7 +1,9 @@
 {
     "collection": "user",
     "schema": {
-        "user_id": "integer",
+        "user_id": "string",
+        "password": "string",
+        "salt": "string",
         "first_name": "string",
         "last_name": "string",
         "home_coordinates":{
