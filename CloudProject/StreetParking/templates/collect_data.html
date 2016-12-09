@@ -126,69 +126,75 @@
                         var street_ave_name = $("#street_ave_name").val();
 
 
-                        $("#between1").val(bet2);
                         var bet1 = $("#between1").val();
-
-                        if (bet1.toLowerCase() == "1st ave") {
-                            $("#between2").val("2nd Ave");
-                        } else if (bet1.toLowerCase() == "2nd ave") {
-                            $("#between2").val("3rd Ave");
-                        } else if (bet1.toLowerCase() == "3rd ave") {
-                            $("#between2").val("Lexington Ave");
-                        } else if (bet1.toLowerCase() == "lexington ave") {
-                            $("#between2").val("Park Ave");
-                        } else if (bet1.toLowerCase() == "park ave") {
-                            $("#between2").val("madison ave");
-                        } else if (bet1.toLowerCase() == "madison ave") {
-                            $("#between2").val("5th Ave");
-                        } else if (bet1.toLowerCase() == "4th ave") {
-                            $("#between2").val("5th Ave");
-                        } else if (bet1.toLowerCase() == "5th ave") {
-                            $("#between2").val("6th Ave");
-                        } else if (bet1.toLowerCase() == "6th ave") {
-                            $("#between2").val("7th Ave");
-                        } else if (bet1.toLowerCase() == "7th ave") {
-                            $("#between2").val("8th Ave");
-                        } else if (bet1.toLowerCase() == "8th ave") {
-                            $("#between2").val("9th Ave");
-                        } else if (bet1.toLowerCase() == "9th ave") {
-                            $("#between2").val("10th Ave");
-                        } else if (bet1.toLowerCase() == "10th ave") {
-                            $("#between2").val("11th Ave");
-                        } else if (bet1.toLowerCase() == "11th ave") {
-                            $("#between2").val("12th Ave");
-                        } else {
-                            $("#between2").val("");
-                        }
-                        if ($("#between2").val().toLowerCase() == "lexington ave") {
-                            $("#num_parking").val("30");
-                        } else if ($("#between2").val().toLowerCase() == "park ave") {
-                            $("#num_parking").val("30");
-                        } else if ($("#between2").val().toLowerCase() == "madison ave") {
-                            $("#num_parking").val("30");
-                        }
-                        else if ($("#between2").val().toLowerCase() == "6th ave") {
-                            $("#num_parking").val("60");
-                        } else if ($("#between2").val().toLowerCase() == "7th ave") {
-                            $("#num_parking").val("44");
-                        } else if ($("#between2").val().toLowerCase() == "8th ave") {
-                            $("#num_parking").val("44");
-                        } else if ($("#between2").val().toLowerCase() == "9th ave") {
-                            $("#num_parking").val("44");
-                        } else if ($("#between2").val().toLowerCase() == "10th ave") {
-                            $("#num_parking").val("44");
-                        } else if ($("#between2").val().toLowerCase() == "11th ave") {
-                            $("#num_parking").val("44");
-                        } else if ($("#between2").val().toLowerCase() == "12th ave") {
-                            $("#num_parking").val("40");
+                        if ($("#parking_on:checked").val() == "street") {
+                            var streetNum = $.fn.extractStartNumbers(street_ave_name) + 1;
+                            if (streetNum != 1) {
+                                $("#street_ave_name").val(streetNum + $.fn.getNumberAdjective(streetNum) + " st");
+                            }
+{#                            if (bet1.toLowerCase() == "1st ave") {#}
+{#                                $("#between2").val("2nd Ave");#}
+{#                            } else if (bet1.toLowerCase() == "2nd ave") {#}
+{#                                $("#between2").val("3rd Ave");#}
+{#                            } else if (bet1.toLowerCase() == "3rd ave") {#}
+{#                                $("#between2").val("Lexington Ave");#}
+{#                            } else if (bet1.toLowerCase() == "lexington ave") {#}
+{#                                $("#between2").val("Park Ave");#}
+{#                            } else if (bet1.toLowerCase() == "park ave") {#}
+{#                                $("#between2").val("madison ave");#}
+{#                            } else if (bet1.toLowerCase() == "madison ave") {#}
+{#                                $("#between2").val("5th Ave");#}
+{#                            } else if (bet1.toLowerCase() == "4th ave") {#}
+{#                                $("#between2").val("5th Ave");#}
+{#                            } else if (bet1.toLowerCase() == "5th ave") {#}
+{#                                $("#between2").val("6th Ave");#}
+{#                            } else if (bet1.toLowerCase() == "6th ave") {#}
+{#                                $("#between2").val("7th Ave");#}
+{#                            } else if (bet1.toLowerCase() == "7th ave") {#}
+{#                                $("#between2").val("8th Ave");#}
+{#                            } else if (bet1.toLowerCase() == "8th ave") {#}
+{#                                $("#between2").val("9th Ave");#}
+{#                            } else if (bet1.toLowerCase() == "9th ave") {#}
+{#                                $("#between2").val("10th Ave");#}
+{#                            } else if (bet1.toLowerCase() == "10th ave") {#}
+{#                                $("#between2").val("11th Ave");#}
+{#                            } else if (bet1.toLowerCase() == "11th ave") {#}
+{#                                $("#between2").val("12th Ave");#}
+{#                            } else {#}
+{#                                $("#between2").val("");#}
+{#                            }#}
+{#                            if ($("#between2").val().toLowerCase() == "lexington ave") {#}
+{#                                $("#num_parking").val("30");#}
+{#                            } else if ($("#between2").val().toLowerCase() == "park ave") {#}
+{#                                $("#num_parking").val("30");#}
+{#                            } else if ($("#between2").val().toLowerCase() == "madison ave") {#}
+{#                                $("#num_parking").val("30");#}
+{#                            }#}
+{#                            else if ($("#between2").val().toLowerCase() == "6th ave") {#}
+{#                                $("#num_parking").val("60");#}
+{#                            } else if ($("#between2").val().toLowerCase() == "7th ave") {#}
+{#                                $("#num_parking").val("44");#}
+{#                            } else if ($("#between2").val().toLowerCase() == "8th ave") {#}
+{#                                $("#num_parking").val("44");#}
+{#                            } else if ($("#between2").val().toLowerCase() == "9th ave") {#}
+{#                                $("#num_parking").val("44");#}
+{#                            } else if ($("#between2").val().toLowerCase() == "10th ave") {#}
+{#                                $("#num_parking").val("44");#}
+{#                            } else if ($("#between2").val().toLowerCase() == "11th ave") {#}
+{#                                $("#num_parking").val("44");#}
+{#                            } else if ($("#between2").val().toLowerCase() == "12th ave") {#}
+{#                                $("#num_parking").val("40");#}
+{#                            }#}
                         }
 
                         //Logic for avenues
-                        if($("#parking_on:checked").val()=="avenue"){
-                        //if (street_ave_name.toLowerCase().endsWith('ave') || street_ave_name.toLowerCase().startsWith('avenue')) {
-                            var streetNum = $.fn.extractStartNumbers(bet2)+1;
-                            if(streetNum!=1){
-                                $("#between2").val(streetNum+ $.fn.getNumberAdjective(streetNum)+" st");
+                        if ($("#parking_on:checked").val() == "avenue") {
+                            //if (street_ave_name.toLowerCase().endsWith('ave') || street_ave_name.toLowerCase().startsWith('avenue')) {
+                            $("#between1").val(bet2);
+
+                            var streetNum = $.fn.extractStartNumbers(bet2) + 1;
+                            if (streetNum != 1) {
+                                $("#between2").val(streetNum + $.fn.getNumberAdjective(streetNum) + " st");
                             }
                         }
 
