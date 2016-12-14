@@ -4,8 +4,10 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import *
 import boto3
 from pymongo import MongoClient
+from .mongo import MongoQuery
 from bson.son import SON
 import json
+import datetime
 
 
 # Create your views here.
@@ -66,20 +68,35 @@ def user_testing(request):
             print(parking_location)
             response.append([parking_location['location']['lat'], parking_location['location']['lng'], parking_location['parking_spots_available']])
             # break
-        return HttpResponse(status=200, content=json.dumps({"lat_longs":response}), content_type="application/json")
+        return HttpResponse(status=200, content=json.dumps({"lat_longs": response}), content_type="application/json")
 
 
 ############################################# Mobile App Service Requests #######################################
+mongo_query = MongoQuery()
+
+
+@csrf_exempt
+def check_username(request):
+    if request.method == "POST":
+        user_id = request.POST.get('user_id', '')
+        result = mongo_query.check_username(user_id)
+        content = json.dumps(result)
+        return HttpResponse(status=200, content_type="application/json", content=content)
+    else:
+        return HttpResponse(status=400, content_type="text/plain", content="Only POST request allowed")
+
 
 @csrf_exempt
 def registration(request):
     if request.method == "POST":
-        user_id = request.POST.get('user_id')
-        password = request.POST.get('password')
-        salt = create_salt()
-        first_name = request.POST.get('first_name', None)
-        last_name = request.POST.get('last_name', None)
-        content = {"information": "Succesfully created user"}
+        user_id = request.POST.get('user_id', '')
+        password = request.POST.get('password', '')
+        re_password = request.POST.get('re_password', '')
+        first_name = request.POST.get('first_name', '')
+        last_name = request.POST.get('last_name', '')
+        email = request.POST.get('email', '')
+        result = mongo_query.register(first_name, last_name, email, user_id, password, re_password)
+        content = json.dumps(result)
         return HttpResponse(status=200, content_type="application/json", content=content)
     else:
         return HttpResponse(status=400, content_type="text/plain", content="Only POST request allowed")
@@ -90,57 +107,8 @@ def login(request):
     if request.method == "POST":
         user_id = request.POST.get('user_id')
         password = request.POST.get('password')
-        content = {"information": "Login Successful"}
-        return HttpResponse(status=200, content_type="application/json", content=content)
-    else:
-        return HttpResponse(status=400, content_type="text/plain", content="Only POST request allowed")
-
-
-@csrf_exempt
-def search_parking(request):
-    if request.method == "POST":
-        user_id = request.POST.get('user_id')
-        password = request.POST.get('password')
-        if not is_authenticated(user_id, password):
-            return HttpResponse(status=400, content_type="text/plain", content="Incorrect login credentials")
-        # Search here for geopoints
-        user_lat = request.POST.get('latitude')
-        user_lng = request.POST.get('longitude')
-        # The above variables would be used in search query
-        content = {"coordinates": [{"street_ave_name": "21st street", "lat": -72.343434, "lng": 40.454534, "parking_spots": 20}]}  # this will come form database
-        return HttpResponse(status=200, content_type="application/json", content=content)
-    else:
-        return HttpResponse(status=400, content_type="text/plain", content="Only POST request allowed")
-
-
-@csrf_exempt
-def park_vehicle(request):
-    if request.method == "POST":
-        user_id = request.POST.get('user_id')
-        password = request.POST.get('password')
-        if not is_authenticated(user_id, password):
-            return HttpResponse(status=400, content_type="text/plain", content="Incorrect login credentials")
-        # Search here for geopoints
-        expected_time = request.POST.get('expected_time')
-        # The above will be updated in database
-        content = {"information": "parked_successfully"}
-        return HttpResponse(status=200, content_type="application/json", content=content)
-    else:
-        return HttpResponse(status=400, content_type="text/plain", content="Only POST request allowed")
-
-
-@csrf_exempt
-def leave_parking_spot(request):
-    if request.method == "POST":
-        user_id = request.POST.get('user_id')
-        password = request.POST.get('password')
-        if not is_authenticated(user_id, password):
-            return HttpResponse(status=400, content_type="text/plain", content="Incorrect login credentials")
-        # Search here for geopoints
-        user_lat = request.POST.get('latitude')
-        user_lng = request.POST.get('longitude')
-        # The above will be updated in database
-        content = {"information": "parked_successfully"}
+        result = mongo_query.login(user_id, password)
+        content = json.dumps(result)
         return HttpResponse(status=200, content_type="application/json", content=content)
     else:
         return HttpResponse(status=400, content_type="text/plain", content="Only POST request allowed")
@@ -149,60 +117,110 @@ def leave_parking_spot(request):
 @csrf_exempt
 def logout(request):
     if request.method == "POST":
-        user_id = request.POST.get('user_id')
-        password = request.POST.get('password')
-        if not is_authenticated(user_id, password):
-            return HttpResponse(status=400, content_type="text/plain", content="Incorrect login credentials")
-        content = {"information": "logged out successfully"}
+        token = request.POST.get('token')
+        result = mongo_query.logout(token)
+        content = json.dumps(result)
         return HttpResponse(status=200, content_type="application/json", content=content)
     else:
         return HttpResponse(status=400, content_type="text/plain", content="Only POST request allowed")
 
 
 @csrf_exempt
-def update_profile(request):
+def get_parking_locations(request):
     if request.method == "POST":
-        user_id = request.POST.get('user_id')
-        password = request.POST.get('password')
-        if not is_authenticated(user_id, password):
-            return HttpResponse(status=400, content_type="text/plain", content="Incorrect login credentials")
-
-        first_name = request.POST.get('first_name', None)
-        last_name = request.POST.get('last_name', None)
-        password = request.POST.get('password', None)
-        home_location = request.POST.get('home_location', None)
-        work_location = request.POST.get('work_location', None)
-        work_time = request.POST.get('work_time', None)
-        profile_image = request.POST.get('profile_image', None)
-        if first_name:
-            pass  # Change first Name
-        if last_name:
-            pass  # change last name
-        if password:
-            pass  # change password
-        if home_location:
-            pass  # change home location
-        if work_location:
-            pass  # change work location
-        if work_time:
-            pass  # change work time
-        if profile_image:
-            pass  # change work time
-
-        content = {"information": "logged out successfully"}
+        token = request.POST.get('token')
+        lat = request.POST.get('lat')
+        lng = request.POST.get('lng')
+        result = mongo_query.get_parking_locations(token, lat, lng)
+        content = json.dumps(result)
         return HttpResponse(status=200, content_type="application/json", content=content)
     else:
         return HttpResponse(status=400, content_type="text/plain", content="Only POST request allowed")
 
 
-def is_authenticated(user_id, password):
-    salt = get_salt()
-    return True
+@csrf_exempt
+def upload_profile_pic(request):
+    if request.method == "POST":
+        token = request.POST.get('token')
+        image = request.POST.get('image')
+        result = mongo_query.upload_profile_pic(token, image)
+        content = json.dumps(result)
+        return HttpResponse(status=200, content_type="application/json", content=content)
+    else:
+        return HttpResponse(status=400, content_type="text/plain", content="Only POST request allowed")
 
 
-def create_salt():
-    return "salt"
+@csrf_exempt
+def add_home_coordinates(request):
+    if request.method == "POST":
+        token = request.POST.get('token')
+        lat = request.POST.get('lat')
+        lng = request.POST.get('lng')
+        result = mongo_query.add_home_coordinates(token, lat, lng)
+        content = json.dumps(result)
+        return HttpResponse(status=200, content_type="application/json", content=content)
+    else:
+        return HttpResponse(status=400, content_type="text/plain", content="Only POST request allowed")
 
 
-def get_salt(user_id):
-    return "salt"
+@csrf_exempt
+def add_office_coordinates(request):
+    if request.method == "POST":
+        token = request.POST.get('token')
+        lat = request.POST.get('lat')
+        lng = request.POST.get('lng')
+        result = mongo_query.add_office_coordinates(token, lat, lng)
+        content = json.dumps(result)
+        return HttpResponse(status=200, content_type="application/json", content=content)
+    else:
+        return HttpResponse(status=400, content_type="text/plain", content="Only POST request allowed")
+
+
+@csrf_exempt
+def add_office_timing(request):
+    if request.method == "POST":
+        token = request.POST.get('token')
+        time = request.POST.get('time').split(":")
+        time_obj = datetime.time(int(time[0]), int(time[1]), int(time[2]))
+        result = mongo_query.add_office_timing(token, time_obj)
+        content = json.dumps(result)
+        return HttpResponse(status=200, content_type="application/json", content=content)
+    else:
+        return HttpResponse(status=400, content_type="text/plain", content="Only POST request allowed")
+
+
+@csrf_exempt
+def park_vehicle(request):
+    if request.method == "POST":
+        token = request.POST.get('token')
+        lat = request.POST.get('lat')
+        lng = request.POST.get('lng')
+        time = request.POST.get('expected_leave_time')
+        time_obj = datetime.datetime.now() + datetime.timedelta(minutes=time)
+        result = mongo_query.park_vehicle(token, lat, lng, time_obj)
+        content = json.dumps(result)
+        return HttpResponse(status=200, content_type="application/json", content=content)
+    else:
+        return HttpResponse(status=400, content_type="text/plain", content="Only POST request allowed")
+
+
+@csrf_exempt
+def unpark_vehicle_by_user(request):
+    if request.method == "POST":
+        token = request.POST.get('token')
+        result = mongo_query.unpark_vehicle_by_user(token)
+        content = json.dumps(result)
+        return HttpResponse(status=200, content_type="application/json", content=content)
+    else:
+        return HttpResponse(status=400, content_type="text/plain", content="Only POST request allowed")
+
+
+@csrf_exempt
+def user_help_request(request):
+    if request.method == "POST":
+        token = request.POST.get('token')
+        result = mongo_query.user_help_request(token)
+        content = json.dumps(result)
+        return HttpResponse(status=200, content_type="application/json", content=content)
+    else:
+        return HttpResponse(status=400, content_type="text/plain", content="Only POST request allowed")
