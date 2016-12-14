@@ -59,12 +59,12 @@ def user_testing(request):
         db = client.street_parking
         lat = float(request.POST.get('lat'))
         lng = float(request.POST.get('lng'))
-        query = {"location": SON([("$near", [lng, lat]), ("$maxDistance", 0.002)])}
+        query = {"location": SON([("$near", [lng, lat]), ("$maxDistance", 0.003)])}
         parking_locations = db.parking_data.find(query)
         response = []
         for parking_location in parking_locations:
             print(parking_location)
-            response.append([parking_location['location']['lat'], parking_location['location']['lng'], parking_location['parking_spots']])
+            response.append([parking_location['location']['lat'], parking_location['location']['lng'], parking_location['parking_spots_available']])
             # break
         return HttpResponse(status=200, content=json.dumps({"lat_longs":response}), content_type="application/json")
 
