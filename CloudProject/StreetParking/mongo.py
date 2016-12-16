@@ -26,10 +26,10 @@ class MongoQuery:
             return_obj = {"success": True}
         return return_obj
 
-    def register(self, first_name, last_name, email, username, password, retype_password):
+    def register(self, full_name, email, password, retype_password):
         error_list = []
-        if username == "":
-            error_list.append("Please enter a username")
+        if email == "":
+            error_list.append("Please enter a n email")
         if password == "":
             error_list.append("Please enter a password")
         if retype_password == "":
@@ -39,24 +39,20 @@ class MongoQuery:
         if len(error_list) > 0:
             return {"success": False, "error_list": error_list}
         db, client = self.get_connection()
-        check_username = db.user.find({"_id": username})
+        check_username = db.user.find({"_id": email})
         if check_username.count() > 0:
             client.close()
-            return {"success": False, "error_list": ["The username already exists! Please select another username"]}
+            return {"success": False, "error_list": ["The email is already registered! Please select another email"]}
         salt = uuid.uuid4().hex
         salt_password = salt + password
         hashed_password = hashlib.sha256(salt_password.encode('ascii')).hexdigest()
-        document_to_insert = {"_id": username, "password": hashed_password, "salt": salt}
-        if email and email != "":
-            document_to_insert['email'] = email
-        if first_name and first_name != "":
-            document_to_insert['first_name'] = first_name
-        if last_name and last_name != "":
-            document_to_insert['last_name'] = last_name
+        document_to_insert = {"_id": email, "password": hashed_password, "salt": salt}
+        if full_name and full_name != "":
+            document_to_insert['full_name'] = full_name
         document_to_insert['member_since'] = datetime.datetime.now()
         db.user.insert_one(document_to_insert)
         token = uuid.uuid4().hex
-        db.user_login_token.insert_one({"_id": username, "token": token, "active": True})
+        db.user_login_token.insert_one({"_id": email, "token": token, "active": True})
         client.close()
         return {"success": True, "token": token}
 
@@ -68,6 +64,7 @@ class MongoQuery:
             return {"success": False, "error_list": ["Invalid Credentials"]}
         user = user.next()
         salt = user['salt']
+        full_name = user['full_name']
         salt_password = salt + password
         hashed_password = hashlib.sha256(salt_password.encode('ascii')).hexdigest()
         if hashed_password != user['password']:
@@ -75,9 +72,9 @@ class MongoQuery:
             return {"success": False, "error_list": ["Invalid Credentials"]}
         db.user_login_token.delete_many({"_id": username})
         token = uuid.uuid4().hex
-        db.user_login_token.delete_many({"_id": username, "token": token, "active": True})
+        db.user_login_token.insert_one({"_id": username, "token": token, "active": True})
         client.close()
-        return {"success": True, "token": token}
+        return {"success": True, "token": token, "full_name": full_name}
 
     def validate_token(self, token):
         db, client = self.get_connection()
@@ -103,7 +100,7 @@ class MongoQuery:
         if not validated['success']:
             return validated
         db, client = self.get_connection()
-        user_id = validated['user_login_token']['user_id']
+        user_id = validated['user_login_token']['_id']
         query = {"location": SON([("$near", [lng, lat]), ("$maxDistance", 0.003)])}
         parking_locations = db.parking_data.find(query)
         parking_spots = []
@@ -120,7 +117,7 @@ class MongoQuery:
         if not validated['success']:
             return validated
         db, client = self.get_connection()
-        user_id = validated['user_login_token']['user_id']
+        user_id = validated['user_login_token']['_id']
         user = db.user.find({"_id": user_id})
         user = user.next()
         client.close()

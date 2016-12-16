@@ -72,7 +72,7 @@ def user_testing(request):
 
 
 ############################################# Mobile App Service Requests #######################################
-mongo_query = MongoQuery()
+mongo_query = MongoQuery('localhost')
 
 
 @csrf_exempt
@@ -89,13 +89,14 @@ def check_username(request):
 @csrf_exempt
 def registration(request):
     if request.method == "POST":
-        user_id = request.POST.get('user_id', '')
-        password = request.POST.get('password', '')
-        re_password = request.POST.get('re_password', '')
-        first_name = request.POST.get('first_name', '')
-        last_name = request.POST.get('last_name', '')
-        email = request.POST.get('email', '')
-        result = mongo_query.register(first_name, last_name, email, user_id, password, re_password)
+        json_input = json.loads(request.body.decode('utf-8'))
+        print ("REQUEST: "+str(json_input))
+        password = json_input.get('password', '')
+        re_password = json_input.get('re_password', '')
+        full_name = json_input.get('full_name', '')
+        email = json_input.get('email', '')
+        result = mongo_query.register(full_name, email, password, re_password)
+        print ("RESPONSE: "+str(result)+"\n")
         content = json.dumps(result)
         return HttpResponse(status=200, content_type="application/json", content=content)
     else:
@@ -105,9 +106,12 @@ def registration(request):
 @csrf_exempt
 def login(request):
     if request.method == "POST":
-        user_id = request.POST.get('user_id')
-        password = request.POST.get('password')
+        json_input = json.loads(request.body.decode('utf-8'))
+        print ("REQUEST: "+str(json_input))
+        user_id = json_input.get('email')
+        password = json_input.get('password')
         result = mongo_query.login(user_id, password)
+        print ("RESPONSE: "+str(result)+"\n")
         content = json.dumps(result)
         return HttpResponse(status=200, content_type="application/json", content=content)
     else:
@@ -117,8 +121,11 @@ def login(request):
 @csrf_exempt
 def logout(request):
     if request.method == "POST":
-        token = request.POST.get('token')
+        json_input = json.loads(request.body.decode('utf-8'))
+        print ("REQUEST: "+str(json_input))
+        token = json_input.get('token')
         result = mongo_query.logout(token)
+        print ("RESPONSE: "+str(result)+"\n")
         content = json.dumps(result)
         return HttpResponse(status=200, content_type="application/json", content=content)
     else:
@@ -128,10 +135,13 @@ def logout(request):
 @csrf_exempt
 def get_parking_locations(request):
     if request.method == "POST":
-        token = request.POST.get('token')
-        lat = request.POST.get('lat')
-        lng = request.POST.get('lng')
+        json_input = json.loads(request.body.decode('utf-8'))
+        print ("REQUEST: "+str(json_input))
+        token = json_input.get('token')
+        lat = json_input.get('lat')
+        lng = json_input.get('lng')
         result = mongo_query.get_parking_locations(token, lat, lng)
+        print ("RESPONSE: "+str(result)+"\n")
         content = json.dumps(result)
         return HttpResponse(status=200, content_type="application/json", content=content)
     else:
