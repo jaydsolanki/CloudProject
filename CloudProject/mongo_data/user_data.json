@@ -1,0 +1,2 @@
+{"_id":"jds797@nyu.edu","member_since":{"$date":"2016-12-16T21:41:45.059Z"},"password":"fbdd770388dadce2fd30877bdd25d12d706ccb131d588122d595b48654d8a7b3","salt":"bdecce156e7e49df8f4356e7c018dcac"}
+{"_id":"yash@gmail.com","salt":"f47647460d8546e6bfa3d6287a128b53","full_name":"Yash Balar","password":"e474198173e004c99f2fda551cd75c4e0831c95adeca98428c6292414addc4f4","member_since":{"$date":"2016-12-16T21:57:32.939Z"}}
