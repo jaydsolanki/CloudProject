@@ -55,8 +55,8 @@ def add_parking_data(request):
     client = MongoClient()
     db = client.street_parking
     db.parking_data.insert_one({"location": {"lng": float(lng), "lat": float(lat)}, "parking_spots_available": num_parking})
-    # pd = ParkingData(latitude=lat, longitude=lng, parking_allowed=parking_allowed, parking_spots=num_parking, between_street_ave=between, street_ave_name=street_ave_name, parking_on=parking_on)
-    # pd.save()
+    pd = ParkingData(latitude=lat, longitude=lng, parking_allowed=parking_allowed, parking_spots=num_parking, between_street_ave=between, street_ave_name=street_ave_name, parking_on=parking_on)
+    pd.save()
     return HttpResponse()
 
 
