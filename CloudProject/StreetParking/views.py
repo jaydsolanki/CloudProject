@@ -27,6 +27,20 @@ def collect_data(request):
     return render(request, 'collect_data.html', context)
 
 
+# @csrf_exempt
+# def add_parking_data(request):
+#     lat = request.POST['lat']
+#     lng = request.POST['lng']
+#     num_parking = request.POST['num_parking']
+#     between = request.POST['between']
+#     street_ave_name = request.POST['street_ave_name']
+#     parking_allowed = request.POST['parking_allowed']
+#     parking_allowed = True if parking_allowed == "true" else False
+#     parking_on = request.POST['parking_on']
+#     print("PARKING ALLOWED: " + str(parking_allowed) + "; TYPE: " + str(type(parking_allowed)))
+#     pd = ParkingData(latitude=lat, longitude=lng, parking_allowed=parking_allowed, parking_spots=num_parking, between_street_ave=between, street_ave_name=street_ave_name, parking_on=parking_on)
+#     pd.save()
+#     return HttpResponse()
 @csrf_exempt
 def add_parking_data(request):
     lat = request.POST['lat']
@@ -38,8 +52,11 @@ def add_parking_data(request):
     parking_allowed = True if parking_allowed == "true" else False
     parking_on = request.POST['parking_on']
     print("PARKING ALLOWED: " + str(parking_allowed) + "; TYPE: " + str(type(parking_allowed)))
-    pd = ParkingData(latitude=lat, longitude=lng, parking_allowed=parking_allowed, parking_spots=num_parking, between_street_ave=between, street_ave_name=street_ave_name, parking_on=parking_on)
-    pd.save()
+    client = MongoClient()
+    db = client.street_parking
+    db.parking_data.insert_one({"location": {"lng": float(lng), "lat": float(lat)}, "parking_spots_available": num_parking})
+    # pd = ParkingData(latitude=lat, longitude=lng, parking_allowed=parking_allowed, parking_spots=num_parking, between_street_ave=between, street_ave_name=street_ave_name, parking_on=parking_on)
+    # pd.save()
     return HttpResponse()
 
 
