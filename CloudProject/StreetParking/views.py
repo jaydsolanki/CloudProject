@@ -151,8 +151,9 @@ def get_parking_locations(request):
 @csrf_exempt
 def upload_profile_pic(request):
     if request.method == "POST":
-        token = request.POST.get('token')
-        image = request.POST.get('image')
+        json_input = json.loads(request.body.decode('utf-8'))
+        token = json_input.get('token')
+        image = json_input.get('image')
         result = mongo_query.upload_profile_pic(token, image)
         content = json.dumps(result)
         return HttpResponse(status=200, content_type="application/json", content=content)
@@ -163,9 +164,10 @@ def upload_profile_pic(request):
 @csrf_exempt
 def add_home_coordinates(request):
     if request.method == "POST":
-        token = request.POST.get('token')
-        lat = request.POST.get('lat')
-        lng = request.POST.get('lng')
+        json_input = json.loads(request.body.decode('utf-8'))
+        token = json_input.get('token')
+        lat = json_input.get('lat')
+        lng = json_input.get('lng')
         result = mongo_query.add_home_coordinates(token, lat, lng)
         content = json.dumps(result)
         return HttpResponse(status=200, content_type="application/json", content=content)
@@ -176,9 +178,10 @@ def add_home_coordinates(request):
 @csrf_exempt
 def add_office_coordinates(request):
     if request.method == "POST":
-        token = request.POST.get('token')
-        lat = request.POST.get('lat')
-        lng = request.POST.get('lng')
+        json_input = json.loads(request.body.decode('utf-8'))
+        token = json_input.get('token')
+        lat = json_input.get('lat')
+        lng = json_input.get('lng')
         result = mongo_query.add_office_coordinates(token, lat, lng)
         content = json.dumps(result)
         return HttpResponse(status=200, content_type="application/json", content=content)
@@ -189,8 +192,9 @@ def add_office_coordinates(request):
 @csrf_exempt
 def add_office_timing(request):
     if request.method == "POST":
-        token = request.POST.get('token')
-        time = request.POST.get('time').split(":")
+        json_input = json.loads(request.body.decode('utf-8'))
+        token = json_input.get('token')
+        time = json_input.get('time').split(":")
         time_obj = datetime.time(int(time[0]), int(time[1]), int(time[2]))
         result = mongo_query.add_office_timing(token, time_obj)
         content = json.dumps(result)
@@ -202,11 +206,12 @@ def add_office_timing(request):
 @csrf_exempt
 def park_vehicle(request):
     if request.method == "POST":
-        token = request.POST.get('token')
-        lat = request.POST.get('lat')
-        lng = request.POST.get('lng')
-        time = request.POST.get('expected_leave_time')
-        time_obj = datetime.datetime.now() + datetime.timedelta(minutes=time)
+        json_input = json.loads(request.body.decode('utf-8'))
+        token = json_input.get('token')
+        lat = json_input.get('lat')
+        lng = json_input.get('lng')
+        expected_leave_time = json_input.get('expected_leave_time')
+        time_obj = datetime.datetime.now() + datetime.timedelta(minutes=int(expected_leave_time))
         result = mongo_query.park_vehicle(token, lat, lng, time_obj)
         content = json.dumps(result)
         return HttpResponse(status=200, content_type="application/json", content=content)
@@ -217,7 +222,8 @@ def park_vehicle(request):
 @csrf_exempt
 def unpark_vehicle_by_user(request):
     if request.method == "POST":
-        token = request.POST.get('token')
+        json_input = json.loads(request.body.decode('utf-8'))
+        token = json_input.get('token')
         result = mongo_query.unpark_vehicle_by_user(token)
         content = json.dumps(result)
         return HttpResponse(status=200, content_type="application/json", content=content)
@@ -228,7 +234,8 @@ def unpark_vehicle_by_user(request):
 @csrf_exempt
 def user_help_request(request):
     if request.method == "POST":
-        token = request.POST.get('token')
+        json_input = json.loads(request.body.decode('utf-8'))
+        token = json_input.get('token')
         result = mongo_query.user_help_request(token)
         content = json.dumps(result)
         return HttpResponse(status=200, content_type="application/json", content=content)

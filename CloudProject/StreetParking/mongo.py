@@ -101,16 +101,17 @@ class MongoQuery:
             return validated
         db, client = self.get_connection()
         user_id = validated['user_login_token']['_id']
-        query = {"location": SON([("$near", [lng, lat]), ("$maxDistance", 0.003)])}
+        query = {"location": SON([("$near", [float(lng), float(lat)]), ("$maxDistance", 0.003)])}
         parking_locations = db.parking_data.find(query)
         parking_spots = []
         for parking_location in parking_locations:
             parking_spots.append([parking_location['location']['lat'], parking_location['location']['lng'], parking_location['parking_spots_available']])
-        other_users_query = {"location": SON([("$near", [lng, lat]), ("$maxDistance", 0.003)]), "date_time_of_query": {"$gte": datetime.datetime.now() - datetime.timedelta(minutes=15)}}
-        others_looking = db.parking_queries.find(other_users_query).count()
+        # other_users_query = {"location": SON([("$near", [float(lng), float(lat)]), ("$maxDistance", 0.003)]), "date_time_of_query": {"$gte": datetime.datetime.now() - datetime.timedelta(minutes=15)}}
+        # others_looking = db.parking_queries.find(other_users_query).count()
         db.parking_queries.insert_one({"user_id": user_id, "coordinates": {"lat": lat, "lng": lng}, "date_time_of_query": datetime.datetime.now()})
         client.close()
-        return {"success": True, "parking_spots": parking_spots, "other_looking": others_looking}
+        # return {"success": True, "parking_spots": parking_spots, "other_looking": others_looking}
+        return {"success": True, "parking_spots": parking_spots}
 
     def upload_profile_pic(self, token, base64_image):
         validated = self.validate_token(token)
@@ -128,7 +129,7 @@ class MongoQuery:
         if not validated['success']:
             return validated
         db, client = self.get_connection()
-        user_id = validated['user_login_token']['user_id']
+        user_id = validated['user_login_token']['_id']
         db.user.find_and_modify({"_id": user_id}, {"$set": {"home_coordinates": {"lat": lat, "lng": lng}}})
         client.close()
         return {"success": True}
@@ -138,7 +139,7 @@ class MongoQuery:
         if not validated['success']:
             return validated
         db, client = self.get_connection()
-        user_id = validated['user_login_token']['user_id']
+        user_id = validated['user_login_token']['_id']
         db.user.find_and_modify({"_id": user_id}, {"$set": {"office_coordinates": {"lat": lat, "lng": lng}}})
         client.close()
         return {"success": True}
@@ -148,7 +149,7 @@ class MongoQuery:
         if not validated['success']:
             return validated
         db, client = self.get_connection()
-        user_id = validated['user_login_token']['user_id']
+        user_id = validated['user_login_token']['_id']
         db.user.find_and_modify({"_id": user_id}, {"$set": {"office_time": time_obj}})
         client.close()
         return {"success": True}
@@ -158,8 +159,8 @@ class MongoQuery:
         if not validated['success']:
             return validated
         db, client = self.get_connection()
-        user_id = validated['user_login_token']['user_id']
-        query = {"location": SON([("$near", [lng, lat]), ("$maxDistance", 0.003)])}
+        user_id = validated['user_login_token']['_id']
+        query = {"location": SON([("$near", [float(lng), float(lat)]), ("$maxDistance", 0.003)])}
         parking_spot = db.parking_data.find_and_modify(query, {"$inc": {"parking_spots_available": -1}})
         if parking_spot['parking_spots_available'] <= 0:
             db.parking_data.find_and_modify(query, {"$set": {"parking_spots_available": 0}})
@@ -172,9 +173,9 @@ class MongoQuery:
         if not validated['success']:
             return validated
         db, client = self.get_connection()
-        user_id = validated['user_login_token']['user_id']
-        parking_obj = db.parking.find_and_modify({"_id": parking_id}, {"$set":{"parked":False, "leave_time": datetime.datetime.now()}})
-        db.parking_data.find_and_modify({"_id":parking_obj['parking_spot_id']},{"$inc":{"parking_spots_available":1}})
+        user_id = validated['user_login_token']['_id']
+        parking_obj = db.parking.find_and_modify({"_id": parking_id}, {"$set": {"parked": False, "leave_time": datetime.datetime.now()}})
+        db.parking_data.find_and_modify({"_id": parking_obj['parking_spot_id']}, {"$inc": {"parking_spots_available": 1}})
         client.close()
         return {"success": True}
 
@@ -183,9 +184,9 @@ class MongoQuery:
         if not validated['success']:
             return validated
         db, client = self.get_connection()
-        user_id = validated['user_login_token']['user_id']
-        parking_obj = db.parking.find_and_modify({"user_id": user_id, "parked": True}, {"$set":{"parked":False, "leave_time": datetime.datetime.now()}})
-        db.parking_data.find_and_modify({"_id":parking_obj['parking_spot_id']},{"$inc":{"parking_spots_available":1}})
+        user_id = validated['user_login_token']['_id']
+        parking_obj = db.parking.find_and_modify({"user_id": user_id, "parked": True}, {"$set": {"parked": False, "leave_time": datetime.datetime.now()}})
+        db.parking_data.find_and_modify({"_id": parking_obj['parking_spot_id']}, {"$inc": {"parking_spots_available": 1}})
         client.close()
         return {"success": True}
 
@@ -196,4 +197,3 @@ class MongoQuery:
         db, client = self.get_connection()
         client.close()
         return {"success": True}
-
