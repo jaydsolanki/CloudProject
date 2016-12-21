@@ -41,3 +41,9 @@ for line in f:
 	# json_data["parking_spots_available"] = json_data['parking_spots']
 	inserted_record = db.user.insert_one(json_data)
 print ("Added User Data")
+
+print ("Adding amazon credentials to db")
+f = open("/Users/jaysolanki/.aws/credentials",'r')
+d = f.read().split("\n")
+
+db.aws_credentials.insert_one({"access_token":d[1].split("=")[1].strip(), "access_token_secret":d[2].split("=")[1].strip()})

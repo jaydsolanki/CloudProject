@@ -5,7 +5,6 @@ import uuid
 import hashlib
 import datetime
 
-
 class MongoQuery:
     def __init__(self, connection_url):
         self.client = None
@@ -15,6 +14,13 @@ class MongoQuery:
         client = MongoClient(self.connection_url)
         db = client.street_parking
         return db, client
+
+    def get_aws_credentials(self):
+        db, client = self.get_connection()
+        obj = db.aws_credentials.find_one()
+        result = [obj['access_token'], obj['access_token_secret']]
+        client.close()
+        return result
 
     def add_parking_data(self, lat, lng, parking_spots, street_ave_name, between_street_ave, parking_allowed, parking_on):
         db, client = self.get_connection()
@@ -141,6 +147,11 @@ class MongoQuery:
         client.close()
         # return {"success": True, "parking_spots": parking_spots, "other_looking": others_looking}
         return {"success": True, "parking_spots": parking_spots}
+
+    def get_parking_locations_kafka(self, lat, lng):
+        add_to_kafka
+        pass
+
 
     def upload_profile_pic(self, token, base64_image):
         validated = self.validate_token(token)

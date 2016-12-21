@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import *
-import boto3
+
 from pymongo import MongoClient
 from .mongo import MongoQuery
 from bson.son import SON
@@ -10,7 +10,7 @@ import json
 import datetime
 from CloudProject.settings import MONGO_URL
 mongo_query = MongoQuery(MONGO_URL)
-
+from .aws import *
 # Create your views here.
 
 
@@ -22,7 +22,7 @@ def index(request):
 @csrf_exempt
 def collect_data(request):
     parking_data = mongo_query.get_all_parking_locations_web_app()
-    context = {"title": "Collect Data", 'parking_data': parking_data}
+    context = {"title": "Collect Data", 'parking_data': parking_data}   
     return render(request, 'collect_data.html', context)
 
 
@@ -137,6 +137,26 @@ def get_parking_locations(request):
 
 
 @csrf_exempt
+def get_parking_locations_kafka(request):
+    if request.method == "POST":
+        json_input = json.loads(request.body.decode('utf-8'))
+        print ("REQUEST: "+str(json_input))
+        token = json_input.get('token')
+        lat = json_input.get('lat')
+        lng = json_input.get('lng')
+        topic_arn = json_input.get('topic_arn', None)
+        if not topic_arn:
+            topic = create_sns_topic(token)
+            topic_arn = topic.arn
+        result = add_to_kafka(token, lat, lng, topic_arn)
+        print ("RESPONSE: "+str(result)+"\n")
+        content = json.dumps(result)
+        return HttpResponse(status=200, content_type="application/json", content=content)
+    else:
+        return HttpResponse(status=400, content_type="text/plain", content="Only POST request allowed")
+
+
+@csrf_exempt
 def upload_profile_pic(request):
     if request.method == "POST":
         json_input = json.loads(request.body.decode('utf-8'))
@@ -229,3 +249,16 @@ def user_help_request(request):
         return HttpResponse(status=200, content_type="application/json", content=content)
     else:
         return HttpResponse(status=400, content_type="text/plain", content="Only POST request allowed")
+
+
+@csrf_exempt
+def sns_request(request):
+    parameters = json.loads(request.GET.get("sns_paramater"))
+    topic_arn = parameters['topic_arn']
+    lat = float(parameters['lat'])
+    lng = float(parameters['lng'])
+    token = parameters['token']
+    result = mongo_query.get_parking_locations(token, lat, lng)
+    publish_sns_results(topic_arn, result)
+    return HttpResponse()
+
