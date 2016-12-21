@@ -1,11 +1,10 @@
 {
     "collection": "user",
     "schema": {
-        "user_id": "string",
+        "emaild": "string",
         "password": "string",
         "salt": "string",
-        "first_name": "string",
-        "last_name": "string",
+        "full_name": "string",
         "home_coordinates":{
             "lng": "float",
             "lat": "float"

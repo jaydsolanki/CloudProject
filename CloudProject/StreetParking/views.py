@@ -8,7 +8,7 @@ from .mongo import MongoQuery
 from bson.son import SON
 import json
 import datetime
-
+mongo_url = '54.202.226.107'
 
 # Create your views here.
 
@@ -52,7 +52,7 @@ def add_parking_data(request):
     parking_allowed = True if parking_allowed == "true" else False
     parking_on = request.POST['parking_on']
     print("PARKING ALLOWED: " + str(parking_allowed) + "; TYPE: " + str(type(parking_allowed)))
-    client = MongoClient()
+    client = MongoClient(mongo_url)
     db = client.street_parking
     db.parking_data.insert_one({"location": {"lng": float(lng), "lat": float(lat)}, "parking_spots_available": num_parking})
     pd = ParkingData(latitude=lat, longitude=lng, parking_allowed=parking_allowed, parking_spots=num_parking, between_street_ave=between, street_ave_name=street_ave_name, parking_on=parking_on)
@@ -74,7 +74,7 @@ def user_testing(request):
         context = {'title': "User Testing"}
         return render(request, 'user_testing.html', context)
     else:
-        client = MongoClient()
+        client = MongoClient(mongo_url)
         db = client.street_parking
         lat = float(request.POST.get('lat'))
         lng = float(request.POST.get('lng'))
@@ -89,7 +89,7 @@ def user_testing(request):
 
 
 ############################################# Mobile App Service Requests #######################################
-mongo_query = MongoQuery('localhost')
+mongo_query = MongoQuery(mongo_url)
 
 
 @csrf_exempt
