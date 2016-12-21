@@ -38,9 +38,9 @@
             ];
             {% for lat_long in parking_data %}
                 var marker{{ forloop.counter }} = new google.maps.Marker({
-                    position: {"lat": parseFloat({{ lat_long.0 }}), "lng": parseFloat({{ lat_long.1 }})},
-                    title: "{{ lat_long.2 }}; {{ lat_long.3 }}; {{ lat_long.4 }}",
-                    {% if lat_long.5 == "street" %}
+                    position: {"lat": parseFloat({{ lat_long.location.lat }}), "lng": parseFloat({{ lat_long.location.lng }})},
+                    title: "{{ lat_long.street_ave_name }}; {{ lat_long.parking_spots }}; {{ lat_long.between_street_ave }}",
+                    {% if lat_long.parking_on == "street" %}
                         icon: stored_pinImage,
                     {% else %}
                         icon: stored_pinImage2,
@@ -52,8 +52,8 @@
                         url: '/remove_parking_data/',
                         type: 'post',
                         data: {
-                            lat: parseFloat({{ lat_long.0 }}),
-                            lng: parseFloat({{ lat_long.1 }}),
+                            lat: parseFloat({{ lat_long.location.lat }}),
+                            lng: parseFloat({{ lat_long.location.lng }}),
                         },
                         success: function (response) {
 

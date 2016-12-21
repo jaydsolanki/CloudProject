@@ -8,7 +8,8 @@ from .mongo import MongoQuery
 from bson.son import SON
 import json
 import datetime
-mongo_url = '54.202.226.107'
+from CloudProject.settings import MONGO_URL
+mongo_query = MongoQuery(MONGO_URL)
 
 # Create your views here.
 
@@ -20,27 +21,11 @@ def index(request):
 
 @csrf_exempt
 def collect_data(request):
-    parking_data = list(ParkingData.objects.all().values_list('latitude', 'longitude', 'street_ave_name', 'parking_spots', 'between_street_ave', 'parking_on'))
-    # for i in range(len(lat_long_list)):
-    #     lat_long_list[i] = list(lat_long_list[i])
+    parking_data = mongo_query.get_all_parking_locations_web_app()
     context = {"title": "Collect Data", 'parking_data': parking_data}
     return render(request, 'collect_data.html', context)
 
 
-# @csrf_exempt
-# def add_parking_data(request):
-#     lat = request.POST['lat']
-#     lng = request.POST['lng']
-#     num_parking = request.POST['num_parking']
-#     between = request.POST['between']
-#     street_ave_name = request.POST['street_ave_name']
-#     parking_allowed = request.POST['parking_allowed']
-#     parking_allowed = True if parking_allowed == "true" else False
-#     parking_on = request.POST['parking_on']
-#     print("PARKING ALLOWED: " + str(parking_allowed) + "; TYPE: " + str(type(parking_allowed)))
-#     pd = ParkingData(latitude=lat, longitude=lng, parking_allowed=parking_allowed, parking_spots=num_parking, between_street_ave=between, street_ave_name=street_ave_name, parking_on=parking_on)
-#     pd.save()
-#     return HttpResponse()
 @csrf_exempt
 def add_parking_data(request):
     lat = request.POST['lat']
@@ -51,12 +36,7 @@ def add_parking_data(request):
     parking_allowed = request.POST['parking_allowed']
     parking_allowed = True if parking_allowed == "true" else False
     parking_on = request.POST['parking_on']
-    print("PARKING ALLOWED: " + str(parking_allowed) + "; TYPE: " + str(type(parking_allowed)))
-    client = MongoClient(mongo_url)
-    db = client.street_parking
-    db.parking_data.insert_one({"location": {"lng": float(lng), "lat": float(lat)}, "parking_spots_available": num_parking})
-    pd = ParkingData(latitude=lat, longitude=lng, parking_allowed=parking_allowed, parking_spots=num_parking, between_street_ave=between, street_ave_name=street_ave_name, parking_on=parking_on)
-    pd.save()
+    mongo_query.add_parking_data(lat,lng,num_parking,street_ave_name,between,parking_allowed,parking_on)
     return HttpResponse()
 
 
@@ -64,7 +44,7 @@ def add_parking_data(request):
 def remove_parking_data(request):
     lat = request.POST['lat']
     lng = request.POST['lng']
-    ParkingData.objects.filter(latitude=lat, longitude=lng).delete()
+    mongo_query.delete_parking_spot(lat,lng)
     return HttpResponse()
 
 
@@ -74,22 +54,13 @@ def user_testing(request):
         context = {'title': "User Testing"}
         return render(request, 'user_testing.html', context)
     else:
-        client = MongoClient(mongo_url)
-        db = client.street_parking
         lat = float(request.POST.get('lat'))
         lng = float(request.POST.get('lng'))
-        query = {"location": SON([("$near", [lng, lat]), ("$maxDistance", 0.003)])}
-        parking_locations = db.parking_data.find(query)
-        response = []
-        for parking_location in parking_locations:
-            print(parking_location)
-            response.append([parking_location['location']['lat'], parking_location['location']['lng'], parking_location['parking_spots_available']])
-            # break
-        return HttpResponse(status=200, content=json.dumps({"lat_longs": response}), content_type="application/json")
+        parking_locations = mongo_query.get_parking_locations_web_app(lat, lng)
+        return HttpResponse(status=200, content=json.dumps({"lat_longs": parking_locations}), content_type="application/json")
 
 
 ############################################# Mobile App Service Requests #######################################
-mongo_query = MongoQuery(mongo_url)
 
 
 @csrf_exempt

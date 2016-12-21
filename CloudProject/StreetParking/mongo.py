@@ -16,14 +16,22 @@ class MongoQuery:
         db = client.street_parking
         return db, client
 
+    def add_parking_data(self, lat, lng, parking_spots, street_ave_name, between_street_ave, parking_allowed, parking_on):
+        db, client = self.get_connection()
+        db.parking_data.insert_one({"location":{"lat":float(lat), "lng":float(lng)}, "parking_spots": int(parking_spots), "street_ave_name": street_ave_name,\
+                                    "between_street_ave": between_street_ave, "parking_allowed": parking_allowed, "parking_on": parking_on, "parking_spots_available": int(parking_spots)})
+        client.close()
+
     def check_username(self, username):
         db, client = self.get_connection()
         check_username = db.user.find({"_id": username})
-
         if check_username.count() > 0:
+            client.close()
             return_obj = {"success": False, "error_list": ["The username already exists! Please select another username"]}
         else:
+            client.close()
             return_obj = {"success": True}
+        client.close()
         return return_obj
 
     def register(self, full_name, email, password, retype_password):
@@ -94,6 +102,27 @@ class MongoQuery:
         db.user_login_token.delete_many({"token": token})
         client.close()
         return {"success": True}
+
+    def delete_parking_spot(self, lat,lng):
+        db, client = self.get_connection()
+        db.parking_data.remove({"location":{"lat":float(lat), "lng": float(lng)}})
+        client.close()
+
+    def get_parking_locations_web_app(self, lat, lng):
+        db, client = self.get_connection()
+        query = {"location": SON([("$near", [float(lng), float(lat)]), ("$maxDistance", 0.003)])}
+        parking_locations = db.parking_data.find(query)
+        parking_spots = []
+        for parking_location in parking_locations:
+            parking_spots.append([parking_location['location']['lat'], parking_location['location']['lng'], parking_location['parking_spots_available']])
+        client.close()
+        return parking_spots
+
+    def get_all_parking_locations_web_app(self):
+        db, client = self.get_connection()
+        parking_locations = list(db.parking_data.find({}))
+        client.close()
+        return parking_locations
 
     def get_parking_locations(self, token, lat, lng):
         validated = self.validate_token(token)
