@@ -206,7 +206,8 @@ class MongoQuery:
             return validated
         db, client = self.get_connection()
         user_id = validated['user_login_token']['_id']
-        query = {"location": SON([("$near", [float(lng), float(lat)]), ("$maxDistance", 0.003)])}
+        query = {"location": SON([("$near", [float(lat), float(lng)]), ("$maxDistance", 0.003)])}
+        # query = {"location": SON([("$near", [float(lng), float(lat)]), ("$maxDistance", 0.003)])}
         parking_spot = db.parking_data.find_and_modify(query, {"$inc": {"parking_spots_available": -1}})
         if parking_spot['parking_spots_available'] <= 0:
             db.parking_data.find_and_modify(query, {"$set": {"parking_spots_available": 0}})
