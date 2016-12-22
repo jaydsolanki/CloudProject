@@ -266,3 +266,8 @@ class MongoQuery:
         aws.publish_sns_results(end_point_arn, result)
         client.close()
         return {"success": True}
+
+    def add_random_data(self):
+        db, client = self.get_connection()
+        db.random_data.insert_one({"r_data":str(datetime.datetime.now())})
+        client.close()
