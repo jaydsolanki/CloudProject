@@ -24,14 +24,14 @@ class AWS:
         return {"success": True}
 
     def publish_sns_results(self, end_point_arn, results):
-        sns = boto3.client('sns', aws_access_key_id=self.access_token, aws_secret_access_key=self.access_token_secret)
+        sns = boto3.client('sns', aws_access_key_id=self.access_token, aws_secret_access_key=self.access_token_secret, region_name='us-west-2')
         sns.publish(
             TargetArn=end_point_arn,
             Message=json.dumps(results)
         )
 
     def create_application_endpoint(self, gcm_token):
-        client = boto3.client('sns', aws_access_key_id=self.access_token, aws_secret_access_key=self.access_token_secret)
+        client = boto3.client('sns', aws_access_key_id=self.access_token, aws_secret_access_key=self.access_token_secret, region_name='us-west-2')
         end_point_result = client.create_platform_endpoint(
             PlatformApplicationArn=SNS_APPLICATION_ARN,
             Token=gcm_token
