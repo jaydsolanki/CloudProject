@@ -10,7 +10,7 @@ import json
 import datetime
 from CloudProject.settings import MONGO_URL
 mongo_query = MongoQuery(MONGO_URL)
-from .aws import *
+#
 # Create your views here.
 
 
@@ -144,11 +144,8 @@ def get_parking_locations_kafka(request):
         token = json_input.get('token')
         lat = json_input.get('lat')
         lng = json_input.get('lng')
-        topic_arn = json_input.get('topic_arn', None)
-        if not topic_arn:
-            topic = create_sns_topic(token)
-            topic_arn = topic.arn
-        result = add_to_kafka(token, lat, lng, topic_arn)
+        gcm_token = json_input.get('gcm_token', None)
+        result = mongo_query.add_to_kafka(token, lat, lng, gcm_token)
         print ("RESPONSE: "+str(result)+"\n")
         content = json.dumps(result)
         return HttpResponse(status=200, content_type="application/json", content=content)
@@ -253,12 +250,13 @@ def user_help_request(request):
 
 @csrf_exempt
 def sns_request(request):
-    parameters = json.loads(request.GET.get("sns_paramater"))
-    topic_arn = parameters['topic_arn']
+    parameters = json.loads(request.GET.get("sns_parameter"))
+    gcm_token = parameters['gcm_token']
     lat = float(parameters['lat'])
     lng = float(parameters['lng'])
     token = parameters['token']
-    result = mongo_query.get_parking_locations(token, lat, lng)
-    publish_sns_results(topic_arn, result)
+    mongo_query.publish_sns_results(token, gcm_token, lat, lng)
     return HttpResponse()
+
+
 

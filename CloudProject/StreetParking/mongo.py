@@ -4,12 +4,16 @@ from bson.objectid import ObjectId
 import uuid
 import hashlib
 import datetime
-import boto3
+from .aws import AWS
+
 
 class MongoQuery:
     def __init__(self, connection_url):
         self.client = None
         self.connection_url = connection_url
+        db, client = self.get_connection()
+        self.aws_credentials = db.aws_credentials.find_one()
+        client.close()
 
     def get_connection(self):
         client = MongoClient(self.connection_url)
@@ -25,7 +29,7 @@ class MongoQuery:
 
     def add_parking_data(self, lat, lng, parking_spots, street_ave_name, between_street_ave, parking_allowed, parking_on):
         db, client = self.get_connection()
-        db.parking_data.insert_one({"location":{"lat":float(lat), "lng":float(lng)}, "parking_spots": int(parking_spots), "street_ave_name": street_ave_name,\
+        db.parking_data.insert_one({"location": {"lat": float(lat), "lng": float(lng)}, "parking_spots": int(parking_spots), "street_ave_name": street_ave_name, \
                                     "between_street_ave": between_street_ave, "parking_allowed": parking_allowed, "parking_on": parking_on, "parking_spots_available": int(parking_spots)})
         client.close()
 
@@ -110,9 +114,9 @@ class MongoQuery:
         client.close()
         return {"success": True}
 
-    def delete_parking_spot(self, lat,lng):
+    def delete_parking_spot(self, lat, lng):
         db, client = self.get_connection()
-        db.parking_data.remove({"location":{"lat":float(lat), "lng": float(lng)}})
+        db.parking_data.remove({"location": {"lat": float(lat), "lng": float(lng)}})
         client.close()
 
     def get_parking_locations_web_app(self, lat, lng):
@@ -148,11 +152,6 @@ class MongoQuery:
         client.close()
         # return {"success": True, "parking_spots": parking_spots, "other_looking": others_looking}
         return {"success": True, "parking_spots": parking_spots}
-
-    def get_parking_locations_kafka(self, lat, lng):
-        add_to_kafka
-        pass
-
 
     def upload_profile_pic(self, token, base64_image):
         validated = self.validate_token(token)
@@ -239,24 +238,29 @@ class MongoQuery:
         client.close()
         return {"success": True}
 
-    def process_token_helper(self, token, user_token):
-        success_string = False
+    def add_to_kafka(self, token, lat, lng, gcm_token):
         validated = self.validate_token(token)
         if not validated['success']:
             return validated
-        client = boto3.client('sns')
-        platform_endpoint = client.create_platform_endpoint(
-            # Create Platform Application and insert the ARN here
-            PlatformApplicationArn = 'string',
-            Token = user_token
-        )
-        if ('EndpointArn' in platform_endpoint) :
-            endpoint_subscription = client.subscribe(
-                # Fetch Kafka Topic and assign here
-                TopicArn = 'string',
-                Protocol = 'application',
-                Endpoint = platform_endpoint['EndpointArn']
-            )
-        if ('SubscriptionArn' in endpoint_subscription) :
-            success_string = True
-        return {"success": success_string}
+        aws = AWS(self.aws_credentials['access_token'], self.aws_credentials['access_token_secret'])
+        response = aws.add_to_kafka(token, lat, lng, gcm_token)
+        return response
+
+    def publish_sns_results(self, token, gcm_token, lat, lng):
+        db, client = self.get_connection()
+        aws = AWS(self.aws_credentials['access_token'], self.aws_credentials['access_token_secret'])
+        sns_data = db.sns_info.find({"_id": token})
+        if not sns_data:
+            end_point_arn = aws.create_application_endpoint(gcm_token)['end_point_arn']
+            db.sns_info.insert_one({"_id": token, "gcm_token": gcm_token, "end_point_arn": end_point_arn})
+        elif sns_data['gcm_token']!=gcm_token:
+            db.sns_info.delete_many({"_id": token})
+            aws.delete_sns_endpoint(sns_data['end_point_arn'])
+            end_point_arn = aws.create_application_endpoint(gcm_token)
+            db.sns_info.insert_one({"_id":token, "gcm_token": gcm_token, "end_point_arn": end_point_arn})
+        else:
+            end_point_arn = sns_data['end_point_arn']
+        result = self.get_parking_locations(token, lat, lng)
+        aws.publish_sns_results(end_point_arn, result)
+        client.close()
+        return {"success": True}

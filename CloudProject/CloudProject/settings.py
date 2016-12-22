@@ -124,6 +124,11 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
 
-MONGO_URL = '54.202.226.107'
+MONGO_URL = '54.212.246.50'
 
-KAFKA_URL = '54.201.86.18'
+KAFKA_URL = '54.186.153.84'
+
+KAFKA_TOPIC_NAME = 'location_requests'
+
+SNS_APPLICATION_ARN = 'arn:aws:sns:us-west-2:779752491908:app/GCM/StreetParkingDemo'
+
