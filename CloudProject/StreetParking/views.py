@@ -9,10 +9,10 @@ from bson.son import SON
 import json
 import datetime
 from CloudProject.settings import MONGO_URL
-mongo_query = MongoQuery(MONGO_URL)
 #
 # Create your views here.
 
+print (MONGO_URL)
 
 def index(request):
     context = {"title": "Home"}
@@ -21,6 +21,7 @@ def index(request):
 
 @csrf_exempt
 def collect_data(request):
+    mongo_query = MongoQuery(MONGO_URL)
     parking_data = mongo_query.get_all_parking_locations_web_app()
     context = {"title": "Collect Data", 'parking_data': parking_data}   
     return render(request, 'collect_data.html', context)
@@ -28,6 +29,7 @@ def collect_data(request):
 
 @csrf_exempt
 def add_parking_data(request):
+    mongo_query = MongoQuery(MONGO_URL)
     lat = request.POST['lat']
     lng = request.POST['lng']
     num_parking = request.POST['num_parking']
@@ -42,6 +44,7 @@ def add_parking_data(request):
 
 @csrf_exempt
 def remove_parking_data(request):
+    mongo_query = MongoQuery(MONGO_URL)
     lat = request.POST['lat']
     lng = request.POST['lng']
     mongo_query.delete_parking_spot(lat,lng)
@@ -50,6 +53,7 @@ def remove_parking_data(request):
 
 @csrf_exempt
 def user_testing(request):
+    mongo_query = MongoQuery(MONGO_URL)
     if request.method == "GET":
         context = {'title': "User Testing"}
         return render(request, 'user_testing.html', context)
@@ -65,6 +69,7 @@ def user_testing(request):
 
 @csrf_exempt
 def check_username(request):
+    mongo_query = MongoQuery(MONGO_URL)
     if request.method == "POST":
         user_id = request.POST.get('user_id', '')
         result = mongo_query.check_username(user_id)
@@ -76,6 +81,7 @@ def check_username(request):
 
 @csrf_exempt
 def registration(request):
+    mongo_query = MongoQuery(MONGO_URL)
     if request.method == "POST":
         json_input = json.loads(request.body.decode('utf-8'))
         print ("REQUEST: "+str(json_input))
@@ -93,6 +99,7 @@ def registration(request):
 
 @csrf_exempt
 def login(request):
+    mongo_query = MongoQuery(MONGO_URL)
     if request.method == "POST":
         json_input = json.loads(request.body.decode('utf-8'))
         print ("REQUEST: "+str(json_input))
@@ -108,6 +115,7 @@ def login(request):
 
 @csrf_exempt
 def logout(request):
+    mongo_query = MongoQuery(MONGO_URL)
     if request.method == "POST":
         json_input = json.loads(request.body.decode('utf-8'))
         print ("REQUEST: "+str(json_input))
@@ -122,6 +130,7 @@ def logout(request):
 
 @csrf_exempt
 def get_parking_locations(request):
+    mongo_query = MongoQuery(MONGO_URL)
     if request.method == "POST":
         json_input = json.loads(request.body.decode('utf-8'))
         print ("REQUEST: "+str(json_input))
@@ -138,6 +147,7 @@ def get_parking_locations(request):
 
 @csrf_exempt
 def get_parking_locations_kafka(request):
+    mongo_query = MongoQuery(MONGO_URL)
     if request.method == "POST":
         json_input = json.loads(request.body.decode('utf-8'))
         print ("REQUEST: "+str(json_input))
@@ -155,6 +165,7 @@ def get_parking_locations_kafka(request):
 
 @csrf_exempt
 def upload_profile_pic(request):
+    mongo_query = MongoQuery(MONGO_URL)
     if request.method == "POST":
         json_input = json.loads(request.body.decode('utf-8'))
         token = json_input.get('token')
@@ -168,6 +179,7 @@ def upload_profile_pic(request):
 
 @csrf_exempt
 def add_home_coordinates(request):
+    mongo_query = MongoQuery(MONGO_URL)
     if request.method == "POST":
         json_input = json.loads(request.body.decode('utf-8'))
         token = json_input.get('token')
@@ -182,6 +194,7 @@ def add_home_coordinates(request):
 
 @csrf_exempt
 def add_office_coordinates(request):
+    mongo_query = MongoQuery(MONGO_URL)
     if request.method == "POST":
         json_input = json.loads(request.body.decode('utf-8'))
         token = json_input.get('token')
@@ -196,6 +209,7 @@ def add_office_coordinates(request):
 
 @csrf_exempt
 def add_office_timing(request):
+    mongo_query = MongoQuery(MONGO_URL)
     if request.method == "POST":
         json_input = json.loads(request.body.decode('utf-8'))
         token = json_input.get('token')
@@ -210,6 +224,7 @@ def add_office_timing(request):
 
 @csrf_exempt
 def park_vehicle(request):
+    mongo_query = MongoQuery(MONGO_URL)
     if request.method == "POST":
         json_input = json.loads(request.body.decode('utf-8'))
         token = json_input.get('token')
@@ -226,6 +241,7 @@ def park_vehicle(request):
 
 @csrf_exempt
 def unpark_vehicle_by_user(request):
+    mongo_query = MongoQuery(MONGO_URL)
     if request.method == "POST":
         json_input = json.loads(request.body.decode('utf-8'))
         token = json_input.get('token')
@@ -238,6 +254,7 @@ def unpark_vehicle_by_user(request):
 
 @csrf_exempt
 def user_help_request(request):
+    mongo_query = MongoQuery(MONGO_URL)
     if request.method == "POST":
         json_input = json.loads(request.body.decode('utf-8'))
         token = json_input.get('token')
@@ -250,6 +267,7 @@ def user_help_request(request):
 
 @csrf_exempt
 def sns_request(request):
+    mongo_query = MongoQuery(MONGO_URL)
     parameters = json.loads(request.GET.get("sns_parameter"))
     gcm_token = parameters['gcm_token']
     lat = float(parameters['lat'])
