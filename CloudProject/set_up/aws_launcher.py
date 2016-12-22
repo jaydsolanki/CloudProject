@@ -57,7 +57,7 @@ instance.reload()
 ip_address_mongo_server = instance.public_ip_address
 print ("Mongo Instance\n\tssh -i jds797_bigdata.pem ubuntu@"+str(ip_address_mongo_server))
 
-
+'''
 sec_group_name = 'CloudProjectAws'
 sec_group_description = 'Group Created for Cloud Project AWS '
 instance_type = "t2.medium"
@@ -112,3 +112,4 @@ instance.wait_until_running()
 instance.reload()
 ip_address_kafka_server = instance.public_ip_address
 print ("Kafka Instance\n\tssh -i jds797_bigdata.pem ubuntu@"+str(ip_address_kafka_server))
+'''

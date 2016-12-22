@@ -43,6 +43,9 @@ def fill_parking(percent, max_fill=None):
         parking_objs = list(db.parking_data.find())
         random.shuffle(parking_objs)
         for parking_obj in parking_objs:
+            a = random.random()
+            if a>0.25:
+                continue
             if max_fill:
                 remove_spots = random.randint(0,max_fill)
             else:

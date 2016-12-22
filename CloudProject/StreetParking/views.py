@@ -9,10 +9,12 @@ from bson.son import SON
 import json
 import datetime
 from CloudProject.settings import MONGO_URL
+
 #
 # Create your views here.
 
-print (MONGO_URL)
+print(MONGO_URL)
+
 
 def index(request):
     context = {"title": "Home"}
@@ -23,18 +25,25 @@ def index(request):
 def collect_data(request):
     mongo_query = MongoQuery(MONGO_URL)
     parking_data = mongo_query.get_all_parking_locations_web_app()
-    context = {"title": "Collect Data", 'parking_data': parking_data}   
+    context = {"title": "Collect Data", 'parking_data': parking_data}
     return render(request, 'collect_data.html', context)
 
-def generate_test_data():
-    mongo_query = MongoQuery(MONGO_URL)
-    parking_data = mongo_query.get_all_parking_locations_web_app()
-    return parking_data
 
 @csrf_exempt
-def collect_data_test(request):
-    context = {"title": "Collect Data (Test)", 'parking_data': parking_data}
-    return render(request, 'collect_data_test.html', context)
+def simulation(request):
+    context = {"title": "Simulation"}
+    return render(request, 'simulation.html', context)
+
+
+@csrf_exempt
+def query_for_simulation(request):
+    mongo_query = MongoQuery(MONGO_URL)
+    parking_data = mongo_query.get_all_parking_locations_web_app()
+    for i in range(len(parking_data)):
+        parking_data[i] = [parking_data[i]['_id'], parking_data[i]['location']['lat'], parking_data[i]['location']['lng'], parking_data[i]['parking_spots_available']]
+        # print(parking_data[i])
+    return HttpResponse(content_type="application/json", content=json.dumps(parking_data))
+
 
 @csrf_exempt
 def add_parking_data(request):
@@ -47,7 +56,7 @@ def add_parking_data(request):
     parking_allowed = request.POST['parking_allowed']
     parking_allowed = True if parking_allowed == "true" else False
     parking_on = request.POST['parking_on']
-    mongo_query.add_parking_data(lat,lng,num_parking,street_ave_name,between,parking_allowed,parking_on)
+    mongo_query.add_parking_data(lat, lng, num_parking, street_ave_name, between, parking_allowed, parking_on)
     return HttpResponse()
 
 
@@ -56,7 +65,7 @@ def remove_parking_data(request):
     mongo_query = MongoQuery(MONGO_URL)
     lat = request.POST['lat']
     lng = request.POST['lng']
-    mongo_query.delete_parking_spot(lat,lng)
+    mongo_query.delete_parking_spot(lat, lng)
     return HttpResponse()
 
 
@@ -93,13 +102,13 @@ def registration(request):
     mongo_query = MongoQuery(MONGO_URL)
     if request.method == "POST":
         json_input = json.loads(request.body.decode('utf-8'))
-        print ("REQUEST: "+str(json_input))
+        print("REQUEST: " + str(json_input))
         password = json_input.get('password', '')
         re_password = json_input.get('re_password', '')
         full_name = json_input.get('full_name', '')
         email = json_input.get('email', '')
         result = mongo_query.register(full_name, email, password, re_password)
-        print ("RESPONSE: "+str(result)+"\n")
+        print("RESPONSE: " + str(result) + "\n")
         content = json.dumps(result)
         return HttpResponse(status=200, content_type="application/json", content=content)
     else:
@@ -111,11 +120,11 @@ def login(request):
     mongo_query = MongoQuery(MONGO_URL)
     if request.method == "POST":
         json_input = json.loads(request.body.decode('utf-8'))
-        print ("REQUEST: "+str(json_input))
+        print("REQUEST: " + str(json_input))
         user_id = json_input.get('email')
         password = json_input.get('password')
         result = mongo_query.login(user_id, password)
-        print ("RESPONSE: "+str(result)+"\n")
+        print("RESPONSE: " + str(result) + "\n")
         content = json.dumps(result)
         return HttpResponse(status=200, content_type="application/json", content=content)
     else:
@@ -127,10 +136,10 @@ def logout(request):
     mongo_query = MongoQuery(MONGO_URL)
     if request.method == "POST":
         json_input = json.loads(request.body.decode('utf-8'))
-        print ("REQUEST: "+str(json_input))
+        print("REQUEST: " + str(json_input))
         token = json_input.get('token')
         result = mongo_query.logout(token)
-        print ("RESPONSE: "+str(result)+"\n")
+        print("RESPONSE: " + str(result) + "\n")
         content = json.dumps(result)
         return HttpResponse(status=200, content_type="application/json", content=content)
     else:
@@ -142,12 +151,12 @@ def get_parking_locations(request):
     mongo_query = MongoQuery(MONGO_URL)
     if request.method == "POST":
         json_input = json.loads(request.body.decode('utf-8'))
-        print ("REQUEST: "+str(json_input))
+        print("REQUEST: " + str(json_input))
         token = json_input.get('token')
         lat = json_input.get('lat')
         lng = json_input.get('lng')
         result = mongo_query.get_parking_locations(token, lat, lng)
-        print ("RESPONSE: "+str(result)+"\n")
+        print("RESPONSE: " + str(result) + "\n")
         content = json.dumps(result)
         return HttpResponse(status=200, content_type="application/json", content=content)
     else:
@@ -159,13 +168,13 @@ def get_parking_locations_kafka(request):
     mongo_query = MongoQuery(MONGO_URL)
     if request.method == "POST":
         json_input = json.loads(request.body.decode('utf-8'))
-        print ("REQUEST: "+str(json_input))
+        print("REQUEST: " + str(json_input))
         token = json_input.get('token')
         lat = json_input.get('lat')
         lng = json_input.get('lng')
         gcm_token = json_input.get('gcm_token', None)
         result = mongo_query.add_to_kafka(token, lat, lng, gcm_token)
-        print ("RESPONSE: "+str(result)+"\n")
+        print("RESPONSE: " + str(result) + "\n")
         content = json.dumps(result)
         return HttpResponse(status=200, content_type="application/json", content=content)
     else:
@@ -284,6 +293,3 @@ def sns_request(request):
     token = parameters['token']
     mongo_query.publish_sns_results(token, gcm_token, lat, lng)
     return HttpResponse()
-
-
-

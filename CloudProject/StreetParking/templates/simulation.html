@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <script src="http://maps.google.com/maps/api/js?key=AIzaSyCXIE8GD_HtIeAD5Q63Waylyc3JVPx5BDg" type="text/javascript"></script>
+    {#    <script async differ src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXIE8GD_HtIeAD5Q63Waylyc3JVPx5BDg&callback=initMap" type="text/javascript"></script>#}
+
+    <script>
+        window.user_markers = [];
+        window.current_latlng = null;
+        $(document).ready(function () {
+            window.markers = {};
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 13,
+                center: new google.maps.LatLng(40.748896, -73.985130),
+            });
+            var noPoi = [
+                {
+                    featureType: "poi",
+                    stylers: [
+                        {visibility: "off"}
+                    ]
+                }
+            ];
+            map.setOptions({styles: noPoi});
+            $.ajax({
+                url: "/query_for_simulation/",
+                type: "post",
+                success: function (response) {
+                    var location_array = response;
+                    for (var i = 0; i < location_array.length; i++) {
+                        var color_marker = null;
+                        var color_text = null;
+                        if (parseInt(location_array[i][3]) < 10) {
+                            color_marker = "e54040";
+                            color_text = "000000";
+                        } else if (parseInt(location_array[i][3]) <= 15) {
+                            color_marker = "ecff1c";
+                            color_text = "000000";
+                        } else {
+                            color_marker = "0de52a";
+                            color_text = "000000";
+                        }
+                        var base_marker_url = "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=" + location_array[i][3] + "|" + color_marker + "|" + color_text;
+                        var number_pinImage = new google.maps.MarkerImage(base_marker_url,
+                                new google.maps.Size(21, 34),
+                                new google.maps.Point(0, 0),
+                                new google.maps.Point(10, 34));
+                        var marker = new google.maps.Marker({
+                            position: {"lat": parseFloat(location_array[i][1]), "lng": parseFloat(location_array[i][2])},
+                            title: "" + location_array[i][3],
+                            icon: number_pinImage,
+                            map: map
+                        });
+                        window.markers[location_array[i][0]] = marker;
+                    }
+                },
+                error: function (response) {
+                    console.log(JSON.stringify(response));
+                }
+            });
+            $.fn.query_data = function () {
+                $.ajax({
+                    url: "/query_for_simulation/",
+                    type: "post",
+                    success: function (response) {
+                        var location_array = response;
+                        for (var i = 0; i < location_array.length; i++) {
+                            var color_marker = null;
+                            var color_text = null;
+                            if (parseInt(location_array[i][3]) < 10) {
+                                color_marker = "e54040";
+                                color_text = "000000";
+                            } else if (parseInt(location_array[i][3]) <= 15) {
+                                color_marker = "ecff1c";
+                                color_text = "000000";
+                            } else {
+                                color_marker = "0de52a";
+                                color_text = "000000";
+                            }
+                            var base_marker_url = "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=" + location_array[i][3] + "|" + color_marker + "|" + color_text;
+                            var number_pinImage = new google.maps.MarkerImage(base_marker_url,
+                                    new google.maps.Size(21, 34),
+                                    new google.maps.Point(0, 0),
+                                    new google.maps.Point(10, 34));
+                            var marker = new google.maps.Marker({
+                                position: {"lat": parseFloat(location_array[i][1]), "lng": parseFloat(location_array[i][2])},
+                                title: "" + location_array[i][3],
+                                icon: number_pinImage,
+                                map: map
+                            });
+                            window.markers[location_array[i][0]].setMap(null);
+                            window.markers[location_array[i][0]] = marker;
+                        }
+                    },
+                    error: function (response) {
+                        console.log(JSON.stringify(response));
+                    }
+                });
+
+            };
+            setInterval($.fn.query_data, 3000);
+        });
+    </script>
+{% endblock %}
+
+{% block outcontent %}
+    <div align="center">
+        <h5> Collect Data: Enter information and click on map to dump that point to db. To delete click that point again.</h5>
+    </div>
+    <div class="row">
+        <div class="col col-md-12">
+            <div id="map" style="width: 1650px; height: 1000px;">
+
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
