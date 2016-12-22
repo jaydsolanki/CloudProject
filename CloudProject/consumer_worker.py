@@ -23,5 +23,5 @@ def worker_main(queue):
             print(e)
 pool_obj = multiprocessing.Pool(20, worker_main,(queue_obj,))
 
-for msg in consumer:
-    queue_obj.put(msg)
+# for msg in consumer:
+#     queue_obj.put(msg)
