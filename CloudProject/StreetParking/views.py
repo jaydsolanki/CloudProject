@@ -26,6 +26,15 @@ def collect_data(request):
     context = {"title": "Collect Data", 'parking_data': parking_data}   
     return render(request, 'collect_data.html', context)
 
+def generate_test_data():
+    mongo_query = MongoQuery(MONGO_URL)
+    parking_data = mongo_query.get_all_parking_locations_web_app()
+    return parking_data
+
+@csrf_exempt
+def collect_data_test(request):
+    context = {"title": "Collect Data (Test)", 'parking_data': parking_data}
+    return render(request, 'collect_data_test.html', context)
 
 @csrf_exempt
 def add_parking_data(request):
