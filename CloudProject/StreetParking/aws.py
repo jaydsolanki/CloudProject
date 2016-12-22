@@ -39,6 +39,6 @@ class AWS:
         return {"success": True, 'end_point_arn': end_point_result['EndpointArn']}
 
     def delete_sns_endpoint(self, end_point_arn):
-        client = boto3.client('sns', aws_access_key_id=self.access_token, aws_secret_access_key=self.access_token_secret)
+        client = boto3.client('sns', aws_access_key_id=self.access_token, aws_secret_access_key=self.access_token_secret, region_name='us-west-2')
         client.delete_endpoint(EndpointArn=end_point_arn)
         return {"success": True}
