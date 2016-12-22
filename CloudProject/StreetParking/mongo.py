@@ -110,6 +110,10 @@ class MongoQuery:
         if not validated['success']:
             return validated
         db, client = self.get_connection()
+        aws = AWS(self.aws_credentials['access_token'], self.aws_credentials['access_token_secret'])
+        end_point_arn = list(db.sns_info.find({"_id":token}))
+        if end_point_arn and len(end_point_arn)>0:
+            aws.delete_sns_endpoint(end_point_arn[0]['end_point_arn'])
         db.user_login_token.delete_many({"token": token})
         client.close()
         return {"success": True}
@@ -258,7 +262,7 @@ class MongoQuery:
         elif sns_data['gcm_token'] != gcm_token:
             db.sns_info.delete_many({"_id": token})
             aws.delete_sns_endpoint(sns_data['end_point_arn'])
-            end_point_arn = aws.create_application_endpoint(gcm_token)
+            end_point_arn = aws.create_application_endpoint(gcm_token)['end_point_arn']
             db.sns_info.insert_one({"_id": token, "gcm_token": gcm_token, "end_point_arn": end_point_arn})
         else:
             end_point_arn = sns_data['end_point_arn']
