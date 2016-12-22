@@ -18,7 +18,8 @@ def worker_main(queue):
         item = queue.get(True)
         print ("Received request: "+str(item))
         try:
-            url_to_open = django_project_url+"/sns_request?sns_parameter="+urllib2.quote(str(item.value), safe='')
+            url_to_open = django_project_url+"sns_request?sns_parameter="+urllib2.quote(str(item$
+            print("\nURL to Open: "+url_to_open+"\n\n")
             urllib2.urlopen(url_to_open)
         except Exception as e:
             print(e)

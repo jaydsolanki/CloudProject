@@ -255,17 +255,19 @@ class MongoQuery:
     def publish_sns_results(self, token, gcm_token, lat, lng):
         db, client = self.get_connection()
         aws = AWS(self.aws_credentials['access_token'], self.aws_credentials['access_token_secret'])
-        sns_data = db.sns_info.find({"_id": token})
-        if not sns_data:
-            end_point_arn = aws.create_application_endpoint(gcm_token)['end_point_arn']
-            db.sns_info.insert_one({"_id": token, "gcm_token": gcm_token, "end_point_arn": end_point_arn})
-        elif sns_data['gcm_token'] != gcm_token:
-            db.sns_info.delete_many({"_id": token})
-            aws.delete_sns_endpoint(sns_data['end_point_arn'])
+        sns_data = list(db.sns_info.find({"_id": token}))
+        if not sns_data or len(sns_data)==0:
             end_point_arn = aws.create_application_endpoint(gcm_token)['end_point_arn']
             db.sns_info.insert_one({"_id": token, "gcm_token": gcm_token, "end_point_arn": end_point_arn})
         else:
-            end_point_arn = sns_data['end_point_arn']
+            sns_data = sns_data[0]
+            if sns_data['gcm_token'] != gcm_token:
+                db.sns_info.delete_many({"_id": token})
+                aws.delete_sns_endpoint(sns_data['end_point_arn'])
+                end_point_arn = aws.create_application_endpoint(gcm_token)['end_point_arn']
+                db.sns_info.insert_one({"_id": token, "gcm_token": gcm_token, "end_point_arn": end_point_arn})
+            else:
+                end_point_arn = sns_data['end_point_arn']
         result = self.get_parking_locations(token, lat, lng)
         aws.publish_sns_results(end_point_arn, result)
         client.close()

@@ -26,7 +26,7 @@ class AWS:
     def publish_sns_results(self, end_point_arn, results):
         sns = boto3.client('sns', aws_access_key_id=self.access_token, aws_secret_access_key=self.access_token_secret)
         sns.publish(
-            TopicArn=end_point_arn,
+            TargetArn=end_point_arn,
             Message=json.dumps(results)
         )
 
