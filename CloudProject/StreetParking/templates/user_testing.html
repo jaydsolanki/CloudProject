@@ -50,9 +50,20 @@
                             window.parking_markers[i].setMap(null);
                         }
                         for (var i = 0; i < lat_longs.length; i++) {
-                            console.log({"lat": parseFloat(lat_longs[i][0]), "lng": parseFloat(lat_longs[i][1])})
-
-                            var number_pinImage = new google.maps.MarkerImage("https://raw.githubusercontent.com/Concept211/Google-Maps-Markers/master/images/marker_blue"+lat_longs[i][2]+".png",
+                            var color_marker = null;
+                            var color_text = null;
+                            if (parseInt(lat_longs[i][2])<10){
+                                color_marker  = "e54040";
+                                color_text  = "000000";
+                            }else if(parseInt(lat_longs[i][2])<=15){
+                                color_marker  = "ecff1c";
+                                color_text  = "000000";
+                            }else{
+                                color_marker = "0de52a";
+                                color_text  = "000000";
+                            }
+                            var base_marker_url = "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld="+lat_longs[i][2]+"|"+color_marker+"|"+color_text;
+                            var number_pinImage = new google.maps.MarkerImage(base_marker_url,
                                     new google.maps.Size(21, 34),
                                     new google.maps.Point(0, 0),
                                     new google.maps.Point(10, 34));
