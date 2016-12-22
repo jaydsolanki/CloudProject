@@ -291,6 +291,6 @@ def sns_request(request):
     lat = float(parameters['lat'])
     lng = float(parameters['lng'])
     token = parameters['token']
-    mongo_query.add_random_data()
+    mongo_query.add_random_data(gcm_token, lat, lng, token )
     # mongo_query.publish_sns_results(token, gcm_token, lat, lng)
     return HttpResponse()

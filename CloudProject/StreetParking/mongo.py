@@ -255,11 +255,11 @@ class MongoQuery:
         if not sns_data:
             end_point_arn = aws.create_application_endpoint(gcm_token)['end_point_arn']
             db.sns_info.insert_one({"_id": token, "gcm_token": gcm_token, "end_point_arn": end_point_arn})
-        elif sns_data['gcm_token']!=gcm_token:
+        elif sns_data['gcm_token'] != gcm_token:
             db.sns_info.delete_many({"_id": token})
             aws.delete_sns_endpoint(sns_data['end_point_arn'])
             end_point_arn = aws.create_application_endpoint(gcm_token)
-            db.sns_info.insert_one({"_id":token, "gcm_token": gcm_token, "end_point_arn": end_point_arn})
+            db.sns_info.insert_one({"_id": token, "gcm_token": gcm_token, "end_point_arn": end_point_arn})
         else:
             end_point_arn = sns_data['end_point_arn']
         result = self.get_parking_locations(token, lat, lng)
@@ -267,7 +267,7 @@ class MongoQuery:
         client.close()
         return {"success": True}
 
-    def add_random_data(self):
+    def add_random_data(self, gcm_token, lat, lng, token):
         db, client = self.get_connection()
-        db.random_data.insert_one({"r_data":str(datetime.datetime.now())})
+        db.random_data.insert_one({"gcm_token": gcm_token, "lat": lat, "lng": lng, "token": token})
         client.close()
