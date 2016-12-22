@@ -121,7 +121,7 @@ class MongoQuery:
 
     def get_parking_locations_web_app(self, lat, lng):
         db, client = self.get_connection()
-        query = {"location": SON([("$near", [float(lng), float(lat)]), ("$maxDistance", 0.003)])}
+        query = {"location": SON([("$near", [float(lng), float(lat)]), ("$maxDistance", 0.2)])}
         parking_locations = db.parking_data.find(query)
         parking_spots = []
         for parking_location in parking_locations:
