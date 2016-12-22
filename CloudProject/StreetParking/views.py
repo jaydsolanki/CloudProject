@@ -40,7 +40,7 @@ def query_for_simulation(request):
     mongo_query = MongoQuery(MONGO_URL)
     parking_data = mongo_query.get_all_parking_locations_web_app()
     for i in range(len(parking_data)):
-        parking_data[i] = [parking_data[i]['_id'], parking_data[i]['location']['lat'], parking_data[i]['location']['lng'], str(parking_data[i]['parking_spots_available'])]
+        parking_data[i] = [str(parking_data[i]['_id']), parking_data[i]['location']['lat'], parking_data[i]['location']['lng'], parking_data[i]['parking_spots_available']]
         # print(parking_data[i])
     return HttpResponse(content_type="application/json", content=json.dumps(parking_data))
 
