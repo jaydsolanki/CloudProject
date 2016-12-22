@@ -21,5 +21,5 @@ urlpatterns = {
     url('^park_vehicle/', views.park_vehicle, name="park_vehicle"),
     url('^unpark_vehicle_by_user/', views.unpark_vehicle_by_user, name="unpark_vehicle_by_user"),
     url('^user_help_request/', views.user_help_request, name="user_help_request"),
-    url('^/sns_request', views.sns_request, name="sns_request")
+    url('^sns_request', views.sns_request, name="sns_request")
 }
