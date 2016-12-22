@@ -4,6 +4,7 @@ from bson.objectid import ObjectId
 import uuid
 import hashlib
 import datetime
+import boto3
 
 class MongoQuery:
     def __init__(self, connection_url):
@@ -237,3 +238,25 @@ class MongoQuery:
         db, client = self.get_connection()
         client.close()
         return {"success": True}
+
+    def process_token_helper(self, token, user_token):
+        success_string = False
+        validated = self.validate_token(token)
+        if not validated['success']:
+            return validated
+        client = boto3.client('sns')
+        platform_endpoint = client.create_platform_endpoint(
+            # Create Platform Application and insert the ARN here
+            PlatformApplicationArn = 'string',
+            Token = user_token
+        )
+        if ('EndpointArn' in platform_endpoint) :
+            endpoint_subscription = client.subscribe(
+                # Fetch Kafka Topic and assign here
+                TopicArn = 'string',
+                Protocol = 'application',
+                Endpoint = platform_endpoint['EndpointArn']
+            )
+        if ('SubscriptionArn' in endpoint_subscription) :
+            success_string = True
+        return {"success": success_string}
