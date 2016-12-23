@@ -152,12 +152,16 @@ class MongoQuery:
         parking_spots = []
         for parking_location in parking_locations:
             parking_spots.append([parking_location['location']['lat'], parking_location['location']['lng'], parking_location['parking_spots_available']])
-        # other_users_query = {"location": SON([("$near", [float(lng), float(lat)]), ("$maxDistance", 0.003)]), "date_time_of_query": {"$gte": datetime.datetime.now() - datetime.timedelta(minutes=15)}}
-        # others_looking = db.parking_queries.find(other_users_query).count()
-        db.parking_queries.insert_one({"user_id": user_id, "coordinates": {"lat": lat, "lng": lng}, "date_time_of_query": datetime.datetime.now()})
+        try:
+            other_users_query = {"location": SON([("$near", [float(lng), float(lat)]), ("$maxDistance", 0.003)]), "date_time_of_query": {"$gte": datetime.datetime.now() - datetime.timedelta(minutes=15)}}
+            others_looking = db.parking_queries.find(other_users_query).count()
+        except Exception as e:
+            print("ERROR: "+str(e))
+            others_looking = -1
+        db.parking_queries.insert_one({"user_id": user_id, "coordinates": {"lat": float(lat), "lng": float(lng)}, "date_time_of_query": datetime.datetime.now()})
         client.close()
-        # return {"success": True, "parking_spots": parking_spots, "other_looking": others_looking}
-        return {"success": True, "parking_spots": parking_spots}
+        return {"success": True, "parking_spots": parking_spots, "other_looking": others_looking}
+        # return {"success": True, "parking_spots": parking_spots}
 
     def upload_profile_pic(self, token, base64_image):
         validated = self.validate_token(token)
