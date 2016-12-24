@@ -98,13 +98,13 @@ Park Vehicle
 
 Unpark Vehicle
 
-- Once the user returns to the car he/she can upark the vehicle so that the system can show that place as available for other users.
+- Once the user returns to the car he/she can unpark the vehicle so that the system can show that place as available for other users.
 ![alt tag](https://github.com/jaydsolanki/CloudProject/blob/master/2.JPG)
  
 
 Authentication
 
-- We used a token based authentication system in which we would create unique tokens everytime for the user. So no one can ask for parking spots without registration by making requests to the server.
+- We used a token based authentication system in which we would create unique tokens every time for the user. So no one can ask for parking spots without registration by making requests to the server.
 - For every login we created a new token.
 
 
@@ -119,11 +119,11 @@ Web UI
 Django
 
 - All the requests from the App were taken as HTTP POST requests with JSON Parameters.
-- The response ot the APP using the SNS push notifications where the data was emedded as JSON.
+- The response to the APP using the SNS push notifications where the data was embedded as JSON.
 
 Mongo DB
 - We created a Wrapper Class in Python to manage all the Mongo Requests.
-- This Class handled the client connection, quering and termination.
+- This Class handled the client connection, querying and termination.
 - This helped us to manage our code better and it was easier to add new functions.
 
 AWS Services
@@ -135,7 +135,7 @@ AWS Services
 
 This app can be modified through
 
-- User feedbaack on the parking slots availability. At times there is no parking available on particular spots where the user ca notify the app.
+- User feedback on the parking slots availability. At times there is no parking available on particular spots where the user ca notify the app.
 - We could include a point system that would motivate the user to use the app.
 
 ##### Conclusion
